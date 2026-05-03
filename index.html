@@ -1,0 +1,2934 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Forge">
+<meta name="theme-color" content="#080c0f">
+<title>Forge</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c0f;
+  --surface: #0f1519;
+  --surface2: #161d23;
+  --surface3: #1e2830;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --accent: #00e5ff;
+  --accent2: #00b8cc;
+  --accent-dim: rgba(0,229,255,0.08);
+  --text: #e8eef2;
+  --text-muted: #4a6070;
+  --text-dim: #7a96a8;
+  --green: #00ff9d;
+  --green-dim: rgba(0,255,157,0.1);
+  --yellow: #ffe566;
+  --red: #ff4d6a;
+  --done-bg: rgba(0,255,157,0.06);
+  --r: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh; max-width: 430px; margin: 0 auto; overflow-x: hidden;
+}
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── ONBOARDING: natural scroll, no absolute positioning ── */
+#screen-onboarding { background: var(–bg); min-height: 100vh; }
+.ob-step { display: none; padding: 60px 26px 80px; min-height: 100vh; }
+.ob-step.active { display: block; }
+
+.ob-prog-card {
+background: var(–surface2); border: 1px solid var(–border2); border-radius: var(–r);
+padding: 18px 20px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.ob-prog-card:active { background: var(–surface3); border-color: var(–accent); }
+
+.ob-back-btn {
+background: none; border: none; color: var(–accent); cursor: pointer;
+font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700;
+letter-spacing: 0.06em; padding: 0; display: inline-block;
+}
+.ob-back-btn:active { opacity: 0.7; }
+
+.ob-eyebrow {
+font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 600;
+letter-spacing: 0.2em; text-transform: uppercase; color: var(–accent); margin-bottom: 12px;
+}
+.ob-title {
+font-family: ‘Rajdhani’, sans-serif; font-size: 36px; font-weight: 700;
+line-height: 1.05; color: var(–text); margin-bottom: 10px;
+}
+.ob-sub { font-size: 14px; color: var(–text-dim); line-height: 1.6; margin-bottom: 30px; }
+
+.input-group { margin-bottom: 16px; }
+.input-label {
+font-family: ‘Rajdhani’, sans-serif; font-size: 12px; font-weight: 600;
+letter-spacing: 0.12em; text-transform: uppercase;
+color: var(–text-dim); margin-bottom: 8px; display: block;
+}
+.input-row {
+display: flex; align-items: center; gap: 12px;
+background: var(–surface2); border: 1px solid var(–border2);
+border-radius: var(–r); padding: 0 16px; transition: border-color 0.2s;
+}
+.input-row:focus-within { border-color: var(–accent); }
+.input-row.err { border-color: var(–red); }
+.input-row input {
+flex: 1; background: none; border: none; outline: none;
+font-family: ‘Rajdhani’, sans-serif; font-size: 28px; font-weight: 700;
+color: var(–text); padding: 14px 0; width: 100%;
+}
+.input-unit {
+font-family: ‘Rajdhani’, sans-serif; font-size: 13px; font-weight: 600;
+color: var(–text-muted); letter-spacing: 0.08em;
+}
+
+.cadence-block { margin-bottom: 22px; }
+.cadence-row { display: flex; gap: 10px; margin-bottom: 6px; }
+.cadence-btn {
+flex: 1; padding: 13px 8px;
+background: var(–surface2); border: 1px solid var(–border2); border-radius: var(–r);
+color: var(–text-dim); font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 600;
+cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.cadence-btn:active { transform: scale(0.96); }
+.cadence-btn.sel { background: var(–accent-dim); border-color: var(–accent); color: var(–accent); }
+.cadence-note { font-size: 12px; color: var(–text-muted); }
+.cadence-note em { color: var(–accent); font-style: normal; font-weight: 500; }
+
+.ob-footer {
+position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+width: 100%; max-width: 430px;
+padding: 12px 24px 40px;
+background: linear-gradient(to top, var(–bg) 70%, transparent); z-index: 20;
+}
+.ob-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 14px; }
+.ob-dot { width: 6px; height: 6px; border-radius: 50%; background: var(–border2); transition: all 0.3s; }
+.ob-dot.active { background: var(–accent); width: 20px; border-radius: 3px; }
+
+.btn-primary {
+width: 100%; padding: 18px; background: var(–accent); border: none; border-radius: var(–r);
+font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase; color: var(–bg); cursor: pointer; transition: all 0.15s;
+}
+.btn-primary:active { transform: scale(0.97); background: var(–accent2); }
+.btn-primary:disabled { background: var(–surface3); color: var(–text-muted); }
+
+/* ── WORKOUT SCREEN ── */
+#screen-workout { background: var(–bg); height: 100vh; overflow: hidden; display: none; flex-direction: column; }
+#screen-workout.active { display: flex; }
+
+.workout-header {
+padding: 14px 18px 14px; border-bottom: 1px solid var(–border); flex-shrink: 0;
+}
+.phase-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.phase-badge {
+font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 700;
+letter-spacing: 0.18em; text-transform: uppercase; color: var(–accent);
+background: var(–accent-dim); border: 1px solid rgba(0,229,255,0.2);
+padding: 4px 10px; border-radius: 4px;
+}
+.session-lbl {
+font-family: ‘Rajdhani’, sans-serif; font-size: 13px; font-weight: 600;
+color: var(–text-muted); letter-spacing: 0.05em;
+}
+.workout-title {
+font-family: ‘Rajdhani’, sans-serif; font-size: 26px; font-weight: 700;
+color: var(–text); margin-bottom: 12px; line-height: 1.1;
+}
+.progress-track { height: 3px; background: var(–surface3); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+.progress-fill { height: 100%; background: var(–accent); border-radius: 2px; transition: width 0.6s cubic-bezier(0.22,1,0.36,1); }
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(–text-muted); }
+
+.ex-list { flex: 1; overflow-y: auto; padding: 10px 14px 110px; -webkit-overflow-scrolling: touch; }
+
+.ex-card {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–r); margin-bottom: 8px; overflow: hidden;
+transition: border-color 0.2s, background 0.2s;
+}
+.ex-card.done { background: var(–done-bg); border-color: rgba(0,255,157,0.15); }
+.ex-card.active-ex { border-color: var(–accent); }
+
+.ex-hdr { display: flex; align-items: center; padding: 13px 14px; gap: 11px; cursor: pointer; }
+.ex-circle {
+width: 22px; height: 22px; border-radius: 50%;
+border: 2px solid var(–border2); flex-shrink: 0;
+display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.ex-card.done .ex-circle { background: var(–green); border-color: var(–green); }
+.ex-tick { font-size: 11px; color: var(–bg); display: none; }
+.ex-card.done .ex-tick { display: block; }
+.ex-info { flex: 1; min-width: 0; }
+.ex-name {
+font-family: ‘Rajdhani’, sans-serif; font-size: 15px; font-weight: 700;
+color: var(–text); line-height: 1.1; margin-bottom: 2px;
+}
+.ex-meta { font-size: 12px; color: var(–text-muted); }
+.ex-meta span { color: var(–text-dim); }
+.ex-wt-display { text-align: right; flex-shrink: 0; }
+.ex-wt-num {
+font-family: ‘Rajdhani’, sans-serif; font-size: 21px; font-weight: 700;
+color: var(–accent); line-height: 1;
+}
+.ex-wt-unit { font-size: 10px; color: var(–text-muted); letter-spacing: 0.08em; }
+.ex-card.done .ex-wt-num { color: var(–text-muted); }
+
+.sets-panel { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.22,1,0.36,1); }
+.sets-panel.open { max-height: 900px; }
+.sets-inner { border-top: 1px solid var(–border); padding: 8px 12px 12px; }
+.sets-col-hdr {
+display: grid; grid-template-columns: 22px 76px 1fr 38px; gap: 8px;
+padding: 0 2px 6px; font-size: 10px; font-weight: 600;
+letter-spacing: 0.1em; text-transform: uppercase; color: var(–text-muted);
+text-align: center;
+}
+
+/* Set row: # | Weight | Reps stepper | ✓ */
+.set-row {
+display: grid; grid-template-columns: 22px 76px 1fr 38px;
+gap: 8px; align-items: center; padding: 6px 2px;
+}
+.set-row + .set-row { border-top: 1px solid var(–border); }
+.set-row.sdone { background: var(–done-bg); border-radius: 8px; }
+.set-num {
+font-family: ‘Rajdhani’, sans-serif; font-size: 13px; font-weight: 700;
+color: var(–text-muted); text-align: center;
+}
+.wt-field {
+background: var(–surface2); border: 1px solid var(–border2); border-radius: 8px;
+padding: 8px 4px; font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700;
+color: var(–text); text-align: center; width: 100%; outline: none; transition: border-color 0.15s;
+}
+.wt-field:focus { border-color: var(–accent); }
+.sdone .wt-field { background: transparent; border-color: transparent; color: var(–text-muted); }
+
+.reps-stepper {
+display: flex; align-items: center;
+background: var(–surface2); border: 1px solid var(–border2); border-radius: 8px;
+overflow: hidden; height: 38px;
+}
+.sdone .reps-stepper { background: transparent; border-color: transparent; }
+.rep-btn {
+width: 28px; height: 100%; flex-shrink: 0;
+background: none; border: none; color: var(–text-dim);
+font-size: 18px; font-weight: 300; cursor: pointer;
+display: flex; align-items: center; justify-content: center; transition: background 0.1s;
+}
+.rep-btn:active { background: var(–surface3); }
+.rep-val {
+flex: 1; text-align: center;
+font-family: ‘Rajdhani’, sans-serif; font-size: 16px; font-weight: 700; color: var(–text);
+}
+.sdone .rep-val { color: var(–text-muted); }
+
+.set-del {
+width: 34px; height: 34px; border-radius: 8px;
+border: 1px solid rgba(255,77,106,0.3); background: rgba(255,77,106,0.08);
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; transition: all 0.15s; font-size: 12px; color: var(–red);
+}
+.set-del:active { transform: scale(0.88); background: rgba(255,77,106,0.2); }
+
+.add-set-btn {
+width: 100%; margin-top: 8px; padding: 10px;
+background: var(–surface2); border: 1px dashed var(–border2); border-radius: 8px;
+font-family: ‘Rajdhani’, sans-serif; font-size: 13px; font-weight: 600;
+color: var(–text-dim); cursor: pointer; transition: all 0.15s;
+letter-spacing: 0.04em;
+}
+.add-set-btn:active { background: var(–surface3); color: var(–text); }
+
+/* Superset styles */
+.ss-card {
+background: var(–surface); border: 1px solid rgba(255,229,102,0.2);
+border-radius: var(–r); margin-bottom: 8px; overflow: hidden;
+transition: border-color 0.2s, background 0.2s;
+}
+.ss-card.done { background: var(–done-bg); border-color: rgba(0,255,157,0.15); }
+.ss-card.active-ex { border-color: var(–yellow); }
+.ss-hdr { display: flex; align-items: center; padding: 13px 14px; gap: 11px; cursor: pointer; }
+.ss-badge {
+font-family: ‘Rajdhani’, sans-serif; font-size: 10px; font-weight: 700;
+letter-spacing: 0.12em; text-transform: uppercase;
+color: var(–yellow); background: rgba(255,229,102,0.1);
+border: 1px solid rgba(255,229,102,0.25);
+padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+}
+.ss-names { flex: 1; min-width: 0; }
+.ss-name-a { font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700; color: var(–text); line-height: 1.2; }
+.ss-name-b { font-family: ‘Rajdhani’, sans-serif; font-size: 13px; font-weight: 600; color: var(–text-dim); line-height: 1.2; }
+.ss-meta { font-size: 11px; color: var(–text-muted); margin-top: 2px; }
+.ss-done-circle {
+width: 22px; height: 22px; border-radius: 50%;
+border: 2px solid rgba(255,229,102,0.3); flex-shrink: 0;
+display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.ss-card.done .ss-done-circle { background: var(–green); border-color: var(–green); }
+.ss-tick { font-size: 11px; color: var(–bg); display: none; }
+.ss-card.done .ss-tick { display: block; }
+
+/* Superset set row: # | A-weight | A-reps | B-weight | B-reps | ✓ */
+.ss-set-row {
+display: grid; grid-template-columns: 22px 1fr 1fr 36px;
+gap: 6px; align-items: center; padding: 8px 4px;
+}
+.ss-set-row + .ss-set-row { border-top: 1px solid var(–border); }
+.ss-set-row.sdone { background: var(–done-bg); border-radius: 8px; }
+.ss-col-hdr {
+display: grid; grid-template-columns: 22px 1fr 1fr 36px;
+gap: 6px; padding: 0 4px 6px;
+font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+text-transform: uppercase; color: var(–text-muted);
+}
+.ss-ex-label {
+font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+text-transform: uppercase; color: var(–yellow); margin-bottom: 3px;
+}
+.ss-field-group { display: flex; flex-direction: column; gap: 4px; }
+
+.set-chk {
+width: 34px; height: 34px; border-radius: 8px;
+border: 2px solid var(–border2); background: var(–surface2);
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; transition: all 0.15s; font-size: 13px; color: var(–bg);
+}
+.set-chk:active { transform: scale(0.88); }
+.sdone .set-del {
+width: 34px; height: 34px; border-radius: 8px;
+border: 1px solid rgba(255,77,106,0.3); background: rgba(255,77,106,0.08);
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; transition: all 0.15s; font-size: 12px; color: var(–red);
+}
+.set-del:active { transform: scale(0.88); background: rgba(255,77,106,0.2); }
+
+.add-set-btn {
+width: 100%; margin-top: 8px; padding: 10px;
+background: var(–surface2); border: 1px dashed var(–border2); border-radius: 8px;
+font-family: ‘Rajdhani’, sans-serif; font-size: 13px; font-weight: 600;
+color: var(–text-dim); cursor: pointer; transition: all 0.15s;
+letter-spacing: 0.04em;
+}
+.add-set-btn:active { background: var(–surface3); color: var(–text); }
+
+/* Superset styles */
+.ss-card {
+background: var(–surface); border: 1px solid rgba(255,229,102,0.2);
+border-radius: var(–r); margin-bottom: 8px; overflow: hidden;
+transition: border-color 0.2s, background 0.2s;
+}
+.ss-card.done { background: var(–done-bg); border-color: rgba(0,255,157,0.15); }
+.ss-card.active-ex { border-color: var(–yellow); }
+.ss-hdr { display: flex; align-items: center; padding: 13px 14px; gap: 11px; cursor: pointer; }
+.ss-badge {
+font-family: ‘Rajdhani’, sans-serif; font-size: 10px; font-weight: 700;
+letter-spacing: 0.12em; text-transform: uppercase;
+color: var(–yellow); background: rgba(255,229,102,0.1);
+border: 1px solid rgba(255,229,102,0.25);
+padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+}
+.ss-names { flex: 1; min-width: 0; }
+.ss-name-a { font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700; color: var(–text); line-height: 1.2; }
+.ss-name-b { font-family: ‘Rajdhani’, sans-serif; font-size: 13px; font-weight: 600; color: var(–text-dim); line-height: 1.2; }
+.ss-meta { font-size: 11px; color: var(–text-muted); margin-top: 2px; }
+.ss-done-circle {
+width: 22px; height: 22px; border-radius: 50%;
+border: 2px solid rgba(255,229,102,0.3); flex-shrink: 0;
+display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.ss-card.done .ss-done-circle { background: var(–green); border-color: var(–green); }
+.ss-tick { font-size: 11px; color: var(–bg); display: none; }
+.ss-card.done .ss-tick { display: block; }
+
+/* Superset set row: # | A-weight | A-reps | B-weight | B-reps | ✓ */
+.ss-set-row {
+display: grid; grid-template-columns: 22px 1fr 1fr 36px;
+gap: 6px; align-items: center; padding: 8px 4px;
+}
+.ss-set-row + .ss-set-row { border-top: 1px solid var(–border); }
+.ss-set-row.sdone { background: var(–done-bg); border-radius: 8px; }
+.ss-col-hdr {
+display: grid; grid-template-columns: 22px 1fr 1fr 36px;
+gap: 6px; padding: 0 4px 6px;
+font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+text-transform: uppercase; color: var(–text-muted);
+}
+.ss-ex-label {
+font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+text-transform: uppercase; color: var(–yellow); margin-bottom: 3px;
+}
+.ss-field-group { display: flex; flex-direction: column; gap: 4px; }
+
+.set-chk { background: var(–green); border-color: var(–green); }
+
+.bottom-bar {
+position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+width: 100%; max-width: 430px; padding: 12px 20px 38px;
+background: linear-gradient(to top, var(–bg) 60%, transparent); z-index: 10;
+}
+.finish-btn {
+width: 100%; padding: 18px; background: var(–green); border: none; border-radius: var(–r);
+font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase; color: var(–bg); cursor: pointer; transition: all 0.15s;
+}
+.finish-btn:disabled { background: var(–surface3); color: var(–text-muted); }
+.finish-btn:not(:disabled):active { transform: scale(0.97); }
+
+/* ── SUMMARY ── */
+#screen-summary { background: var(–bg); overflow-y: auto; min-height: 100vh; }
+.sum-wrap { padding: 58px 22px 60px; }
+.sum-eyebrow {
+font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 700;
+letter-spacing: 0.2em; text-transform: uppercase; color: var(–green); margin-bottom: 8px;
+}
+.sum-title {
+font-family: ‘Rajdhani’, sans-serif; font-size: 34px; font-weight: 700;
+line-height: 1; color: var(–text); margin-bottom: 6px;
+}
+.sum-sub { font-size: 14px; color: var(–text-dim); margin-bottom: 26px; }
+
+.sec-label {
+font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 700;
+letter-spacing: 0.18em; text-transform: uppercase; color: var(–text-muted); margin-bottom: 10px;
+}
+
+/* 1RM card */
+.orm-card { background: var(–surface); border: 1px solid var(–border); border-radius: var(–r); overflow: hidden; margin-bottom: 22px; }
+.orm-card-hdr {
+padding: 10px 14px; border-bottom: 1px solid var(–border);
+font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(–text-muted);
+}
+.orm-row {
+display: flex; align-items: center; padding: 12px 14px; gap: 10px;
+border-bottom: 1px solid var(–border);
+}
+.orm-row:last-child { border-bottom: none; }
+.orm-lift { flex: 1; }
+.orm-lift-name { font-family: ‘Rajdhani’, sans-serif; font-size: 15px; font-weight: 700; color: var(–text); }
+.orm-lift-prev { font-size: 11px; color: var(–text-muted); margin-top: 2px; }
+.orm-right { text-align: right; }
+.orm-new { font-family: ‘Rajdhani’, sans-serif; font-size: 22px; font-weight: 700; line-height: 1; }
+.orm-new.up { color: var(–green); }
+.orm-new.flat { color: var(–text-dim); }
+.orm-delta { font-size: 11px; margin-top: 2px; color: var(–text-muted); }
+.orm-delta.up { color: var(–green); }
+.upd-btn {
+padding: 6px 11px; background: var(–green-dim);
+border: 1px solid rgba(0,255,157,0.25); border-radius: 6px;
+font-family: ‘Rajdhani’, sans-serif; font-size: 12px; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase; color: var(–green); cursor: pointer;
+white-space: nowrap; transition: all 0.15s; flex-shrink: 0;
+}
+.upd-btn:active { transform: scale(0.95); }
+.upd-btn.done-upd { background: none; border-color: transparent; color: var(–text-muted); pointer-events: none; }
+
+/* Next up card */
+.next-up-card {
+background: var(–accent-dim); border: 1px solid rgba(0,229,255,0.18); border-radius: var(–r);
+padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 12px;
+}
+.next-up-inner-label { font-size: 11px; color: var(–accent); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+.next-up-val { font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700; color: var(–text); }
+
+/* Weights card */
+.wts-card { background: var(–surface); border: 1px solid var(–border); border-radius: var(–r); overflow: hidden; margin-bottom: 24px; }
+.wt-row { display: flex; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(–border); }
+.wt-row:last-child { border-bottom: none; }
+.wt-ex { flex: 1; }
+.wt-ex-name { font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700; color: var(–text); }
+.wt-ex-detail { font-size: 11px; color: var(–text-muted); margin-top: 2px; }
+.wt-next { text-align: right; }
+.wt-next-num { font-family: ‘Rajdhani’, sans-serif; font-size: 20px; font-weight: 700; color: var(–accent); }
+.wt-badge {
+display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+color: var(–green); background: var(–green-dim); border: 1px solid rgba(0,255,157,0.2);
+padding: 1px 6px; border-radius: 4px; margin-top: 2px;
+}
+
+.btn-secondary {
+width: 100%; padding: 16px; background: var(–surface2);
+border: 1px solid var(–border2); border-radius: var(–r);
+font-family: ‘Rajdhani’, sans-serif; font-size: 16px; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase; color: var(–text);
+cursor: pointer; transition: all 0.15s; margin-top: 10px;
+}
+.btn-secondary:active { transform: scale(0.97); }
+
+/* ── HOME SCREEN ── */
+#screen-home { background: var(–bg); min-height: 100vh; overflow-y: auto; display: none; }
+#screen-home.active { display: block; }
+.home-topbar {
+padding: 54px 20px 16px; border-bottom: 1px solid var(–border);
+display: flex; align-items: flex-end; justify-content: space-between;
+}
+.home-greeting { font-size: 12px; color: var(–text-muted); letter-spacing: 0.04em; margin-bottom: 3px; }
+.home-title { font-family: ‘Rajdhani’, sans-serif; font-size: 28px; font-weight: 700; color: var(–text); line-height: 1; }
+.home-logo { font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(–accent); }
+
+.home-action-btn {
+width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(–border2);
+background: var(–surface2); color: var(–text-dim); font-size: 16px;
+cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
+.home-action-btn:active { transform: scale(0.88); background: var(–surface3); }
+.home-action-btn–danger { color: var(–red); border-color: rgba(255,77,106,0.25); background: rgba(255,77,106,0.06); }
+
+.home-section { padding: 20px 16px 0; }
+.home-sec-label {
+font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 700;
+letter-spacing: 0.18em; text-transform: uppercase; color: var(–text-muted); margin-bottom: 10px;
+}
+
+.prog-card {
+background: var(–surface); border: 1px solid var(–border2);
+border-radius: var(–r); overflow: hidden; cursor: pointer;
+transition: border-color 0.15s, background 0.15s; margin-bottom: 16px;
+}
+.prog-card:active { background: var(–surface2); border-color: var(–accent); }
+.prog-card-body { padding: 16px 18px; }
+.prog-card-tag {
+font-family: ‘Rajdhani’, sans-serif; font-size: 10px; font-weight: 700;
+letter-spacing: 0.14em; text-transform: uppercase; color: var(–accent);
+background: var(–accent-dim); border: 1px solid rgba(0,229,255,0.2);
+padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px;
+}
+.prog-card-name { font-family: ‘Rajdhani’, sans-serif; font-size: 22px; font-weight: 700; color: var(–text); margin-bottom: 2px; }
+.prog-card-sub { font-size: 13px; color: var(–text-dim); margin-bottom: 14px; }
+.prog-card-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.prog-card-track { flex: 1; height: 3px; background: var(–surface3); border-radius: 2px; overflow: hidden; }
+.prog-card-fill { height: 100%; background: var(–accent); border-radius: 2px; }
+.prog-card-pct { font-family: ‘Rajdhani’, sans-serif; font-size: 12px; font-weight: 700; color: var(–text-muted); }
+.prog-card-hint { font-size: 11px; color: var(–text-muted); }
+.prog-card-footer {
+border-top: 1px solid var(–border); padding: 10px 18px;
+display: flex; gap: 0; background: var(–surface2);
+}
+.prog-card-stat { flex: 1; text-align: center; }
+.prog-card-stat .v { font-family: ‘Rajdhani’, sans-serif; font-size: 15px; font-weight: 700; color: var(–accent); }
+.prog-card-stat .l { font-size: 10px; color: var(–text-muted); margin-top: 1px; letter-spacing: 0.04em; }
+.prog-card-stat + .prog-card-stat { border-left: 1px solid var(–border); }
+
+.today-card {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–r); overflow: hidden; margin-bottom: 32px;
+}
+.today-card-hdr { padding: 14px 16px 10px; border-bottom: 1px solid var(–border); }
+.today-card-eyebrow {
+font-family: ‘Rajdhani’, sans-serif; font-size: 10px; font-weight: 700;
+letter-spacing: 0.16em; text-transform: uppercase; color: var(–text-muted); margin-bottom: 4px;
+}
+.today-card-title { font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700; color: var(–text); }
+.today-ex-list { padding: 8px 0; }
+.today-ex-row {
+display: flex; align-items: center; justify-content: space-between;
+padding: 7px 16px;
+}
+.today-ex-row + .today-ex-row { border-top: 1px solid var(–border); }
+.today-ex-name { font-size: 13px; color: var(–text); }
+.today-ex-wt { font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700; color: var(–accent); }
+.today-ex-spec { font-size: 11px; color: var(–text-muted); }
+.today-start-btn {
+width: calc(100% - 32px); margin: 0 16px 16px;
+padding: 16px; background: var(–accent); border: none; border-radius: var(–r);
+font-family: ‘Rajdhani’, sans-serif; font-size: 16px; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase; color: var(–bg); cursor: pointer; transition: all 0.15s;
+}
+.today-start-btn:active { transform: scale(0.97); background: var(–accent2); }
+
+/* ── PROGRAM OVERVIEW SCREEN ── */
+#screen-overview { background: var(–bg); min-height: 100vh; overflow-y: auto; display: none; }
+#screen-overview.active { display: block; }
+
+.ov-topbar {
+padding: 54px 18px 14px; border-bottom: 1px solid var(–border);
+display: flex; align-items: center; gap: 12px;
+}
+.ov-back {
+background: none; border: none; color: var(–accent); cursor: pointer;
+font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700;
+letter-spacing: 0.06em; display: flex; align-items: center; gap: 4px; padding: 0;
+}
+.ov-back:active { opacity: 0.7; }
+.ov-topbar-title { font-family: ‘Rajdhani’, sans-serif; font-size: 15px; font-weight: 700; color: var(–text-muted); letter-spacing: 0.06em; }
+
+.ov-hero { padding: 20px 18px; border-bottom: 1px solid var(–border); }
+.ov-prog-name { font-family: ‘Rajdhani’, sans-serif; font-size: 28px; font-weight: 700; color: var(–text); margin-bottom: 2px; }
+.ov-prog-meta { font-size: 13px; color: var(–text-dim); margin-bottom: 16px; }
+.ov-stats-row { display: flex; gap: 10px; }
+.ov-stat {
+flex: 1; background: var(–surface2); border: 1px solid var(–border);
+border-radius: 8px; padding: 10px 12px; text-align: center;
+}
+.ov-stat .v { font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700; color: var(–accent); }
+.ov-stat .l { font-size: 10px; color: var(–text-muted); margin-top: 2px; letter-spacing: 0.04em; }
+
+.ov-section { padding: 18px 16px 0; }
+.ov-sec-label {
+font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 700;
+letter-spacing: 0.18em; text-transform: uppercase; color: var(–text-muted); margin-bottom: 10px;
+}
+
+/* Phase cards */
+.phase-card {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–r); margin-bottom: 8px; overflow: hidden;
+}
+.phase-card.pc-current { border-color: var(–accent); }
+.phase-card.pc-done { opacity: 0.65; }
+.phase-card-hdr { display: flex; align-items: flex-start; justify-content: space-between; padding: 13px 14px 10px; }
+.phase-card-name { font-family: ‘Rajdhani’, sans-serif; font-size: 16px; font-weight: 700; color: var(–text); margin-bottom: 2px; }
+.phase-card-dates { font-size: 11px; color: var(–text-muted); }
+.pc-badge {
+font-family: ‘Rajdhani’, sans-serif; font-size: 10px; font-weight: 700;
+letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; flex-shrink: 0;
+}
+.pc-badge.done { background: rgba(0,255,157,0.08); color: var(–green); border: 1px solid rgba(0,255,157,0.2); }
+.pc-badge.current { background: var(–accent-dim); color: var(–accent); border: 1px solid rgba(0,229,255,0.2); }
+.pc-badge.upcoming { background: var(–surface3); color: var(–text-muted); border: 1px solid var(–border); }
+.phase-card-prog { height: 2px; background: var(–surface3); margin: 0 14px 10px; border-radius: 1px; overflow: hidden; }
+.phase-card-prog-fill { height: 100%; background: var(–accent); border-radius: 1px; }
+.phase-card-focus { font-size: 13px; color: var(–text-dim); padding: 0 14px 10px; }
+.phase-card-notes { border-top: 1px solid var(–border); padding: 8px 14px 10px; display: flex; flex-direction: column; gap: 4px; }
+.phase-card-note { font-size: 12px; color: var(–text-muted); padding-left: 10px; position: relative; }
+.phase-card-note::before { content: ‘·’; position: absolute; left: 0; color: var(–accent); }
+
+/* Calendar */
+.cal-wrap { padding: 0 16px 16px; }
+.cal-month-label { font-family: ‘Rajdhani’, sans-serif; font-size: 12px; font-weight: 700; color: var(–text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; margin-top: 14px; }
+.cal-dow-row { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; margin-bottom: 3px; }
+.cal-dow { font-size: 10px; color: var(–text-muted); text-align: center; font-family: ‘Rajdhani’, sans-serif; font-weight: 700; letter-spacing: 0.05em; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; margin-bottom: 3px; }
+.cal-cell {
+aspect-ratio: 1; border-radius: 5px; display: flex; align-items: center; justify-content: center;
+font-size: 11px; font-family: ‘Rajdhani’, sans-serif; font-weight: 600; cursor: default;
+}
+.cal-cell.empty { background: none; }
+.cal-cell.rest { background: var(–surface2); color: var(–text-muted); }
+.cal-cell.logged { background: rgba(0,229,255,0.12); color: var(–accent); border: 1px solid rgba(0,229,255,0.2); }
+.cal-cell.today-cell { background: var(–accent); color: var(–bg); }
+.cal-cell.upcoming-wo { background: var(–surface3); color: var(–text-dim); border: 1px solid var(–border2); }
+.cal-cell.future-rest { background: var(–surface); color: var(–text-muted); }
+.cal-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.cal-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(–text-muted); }
+.cal-leg-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+/* Notes from PDF */
+.pdf-notes-list { display: flex; flex-direction: column; gap: 8px; padding-bottom: 40px; }
+.pdf-note {
+background: var(–surface); border: 1px solid var(–border); border-left: 2px solid var(–accent);
+border-radius: 0 8px 8px 0; padding: 10px 12px;
+}
+.pdf-note-text { font-size: 13px; color: var(–text-dim); line-height: 1.5; }
+
+/* ── SETTINGS SCREEN ── */
+#screen-settings { background: var(–bg); min-height: 100vh; overflow-y: auto; display: none; }
+#screen-settings.active { display: block; }
+.settings-topbar {
+padding: 54px 18px 14px; border-bottom: 1px solid var(–border);
+display: flex; align-items: center; gap: 12px;
+}
+.settings-back {
+background: none; border: none; color: var(–accent); cursor: pointer;
+font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700;
+letter-spacing: 0.06em; padding: 0; display: flex; align-items: center; gap: 4px;
+}
+.settings-back:active { opacity: 0.7; }
+.settings-topbar-title {
+font-family: ‘Rajdhani’, sans-serif; font-size: 15px; font-weight: 700;
+color: var(–text-muted); letter-spacing: 0.06em;
+}
+.settings-section { padding: 22px 18px 0; }
+.settings-sec-label {
+font-family: ‘Rajdhani’, sans-serif; font-size: 11px; font-weight: 700;
+letter-spacing: 0.18em; text-transform: uppercase; color: var(–text-muted); margin-bottom: 12px;
+}
+.settings-card {
+background: var(–surface); border: 1px solid var(–border);
+border-radius: var(–r); overflow: hidden; margin-bottom: 20px;
+}
+.settings-row {
+display: flex; align-items: center; padding: 14px 16px; gap: 12px;
+border-bottom: 1px solid var(–border);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row-label {
+flex: 1;
+font-family: ‘Rajdhani’, sans-serif; font-size: 15px; font-weight: 700; color: var(–text);
+}
+.settings-row-sub { font-size: 11px; color: var(–text-muted); margin-top: 2px; }
+.max-input-wrap {
+display: flex; align-items: center; gap: 6px;
+}
+.max-input {
+width: 80px; background: var(–surface2); border: 1px solid var(–border2);
+border-radius: 8px; padding: 8px 10px;
+font-family: ‘Rajdhani’, sans-serif; font-size: 20px; font-weight: 700;
+color: var(–text); text-align: center; outline: none; transition: border-color 0.15s;
+}
+.max-input:focus { border-color: var(–accent); }
+.max-input-unit {
+font-family: ‘Rajdhani’, sans-serif; font-size: 12px; font-weight: 600;
+color: var(–text-muted); letter-spacing: 0.08em;
+}
+.settings-save-btn {
+width: 100%; padding: 18px; background: var(–accent); border: none; border-radius: var(–r);
+font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700;
+letter-spacing: 0.06em; text-transform: uppercase; color: var(–bg);
+cursor: pointer; transition: all 0.15s; margin-top: 4px;
+}
+.settings-save-btn:active { transform: scale(0.97); background: var(–accent2); }
+.settings-save-btn.saved { background: var(–green); }
+.settings-info-row {
+display: flex; align-items: center; justify-content: space-between;
+padding: 13px 16px; border-bottom: 1px solid var(–border);
+}
+.settings-info-row:last-child { border-bottom: none; }
+.settings-info-label { font-size: 13px; color: var(–text-dim); }
+.settings-info-val {
+font-family: ‘Rajdhani’, sans-serif; font-size: 14px; font-weight: 700; color: var(–text);
+}
+.wo-breadcrumb {
+display: flex; align-items: center; gap: 6px;
+padding: 52px 18px 10px;
+border-bottom: 1px solid var(–border); background: var(–surface);
+flex-shrink: 0;
+}
+.wo-bc-link {
+font-family: ‘Rajdhani’, sans-serif; font-size: 12px; font-weight: 700;
+letter-spacing: 0.06em; color: var(–accent); cursor: pointer; text-transform: uppercase;
+}
+.wo-bc-link:active { opacity: 0.7; }
+.wo-bc-sep { font-size: 11px; color: var(–text-muted); }
+.wo-bc-cur { font-family: ‘Rajdhani’, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(–text-muted); text-transform: uppercase; }
+</style>
+
+</head>
+<body>
+
+<!-- ═══════════════════════════
+     HOME
+═══════════════════════════ -->
+
+<div id="screen-home" class="screen">
+  <div class="home-topbar">
+    <div>
+      <div class="home-greeting" id="home-greeting">Welcome back</div>
+      <div class="home-title">Forge</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="home-action-btn" onclick="goScreen('screen-settings')" title="Settings">⚙</button>
+      <button class="home-action-btn" id="pause-btn" onclick="togglePause()" title="Pause program">⏸</button>
+      <button class="home-action-btn home-action-btn--danger" onclick="confirmReset()" title="Reset program">↺</button>
+    </div>
+  </div>
+
+  <!-- Pause banner — shown when paused -->
+
+  <div id="pause-banner" style="display:none;background:rgba(255,229,102,0.08);border-bottom:1px solid rgba(255,229,102,0.2);padding:10px 20px;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--yellow)">Program Paused</div>
+      <div id="pause-banner-sub" style="font-size:12px;color:var(--text-muted);margin-top:2px">Timing frozen. Resume when you're back.</div>
+    </div>
+    <button onclick="togglePause()" style="background:rgba(255,229,102,0.12);border:1px solid rgba(255,229,102,0.3);border-radius:8px;padding:6px 12px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;color:var(--yellow);cursor:pointer">Resume</button>
+  </div>
+
+  <div class="home-section">
+    <div class="home-sec-label">Active Program</div>
+    <div class="prog-card" onclick="goScreen('screen-overview')">
+      <div class="prog-card-body">
+        <div class="prog-card-tag" id="home-phase-tag">Phase I</div>
+        <div class="prog-card-name" id="home-prog-name">MAPS Anabolic</div>
+        <div class="prog-card-sub" id="home-prog-sub">Mind Pump Media · 12 weeks</div>
+        <div class="prog-card-progress-row">
+          <div class="prog-card-track"><div class="prog-card-fill" id="home-prog-fill" style="width:0%"></div></div>
+          <div class="prog-card-pct" id="home-prog-pct">0%</div>
+        </div>
+        <div class="prog-card-hint">Tap for program overview ›</div>
+      </div>
+      <div class="prog-card-footer">
+        <div class="prog-card-stat"><div class="v" id="home-stat-phase">—</div><div class="l">Current phase</div></div>
+        <div class="prog-card-stat"><div class="v" id="home-stat-streak">—</div><div class="l">Day streak</div></div>
+        <div class="prog-card-stat"><div class="v" id="home-stat-last">—</div><div class="l">Last workout</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-section">
+    <div class="home-sec-label">Today's Workout</div>
+    <div class="today-card">
+      <div class="today-card-hdr">
+        <div class="today-card-eyebrow" id="today-eyebrow">Loading…</div>
+        <div class="today-card-title" id="today-title">—</div>
+      </div>
+      <div class="today-ex-list" id="today-ex-list"></div>
+      <button class="today-start-btn" id="today-start-btn" onclick="goToWorkout()">Start Workout</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset confirmation modal -->
+
+<div id="reset-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:flex-end;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r) var(--r) 0 0;padding:28px 24px 48px;width:100%;max-width:430px">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px">Reset Program?</div>
+    <div style="font-size:14px;color:var(--text-dim);line-height:1.5;margin-bottom:24px">This clears all session history, logged weights, and progress. Your working maxes are also cleared. This cannot be undone.</div>
+    <button onclick="doReset()" style="width:100%;padding:16px;background:var(--red);border:none;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#fff;cursor:pointer;margin-bottom:10px">Yes, Reset Everything</button>
+    <button onclick="closeModal()" style="width:100%;padding:14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);cursor:pointer">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     OVERVIEW
+═══════════════════════════ -->
+
+<div id="screen-overview" class="screen">
+  <div class="ov-topbar">
+    <button class="ov-back" onclick="goScreen('screen-home')">‹ Home</button>
+    <div class="ov-topbar-title">Program Overview</div>
+  </div>
+
+  <div class="ov-hero">
+    <div class="ov-prog-name" id="ov-prog-name">MAPS Anabolic</div>
+    <div class="ov-prog-meta" id="ov-prog-meta">Mind Pump Media · 12 weeks · 84 training days</div>
+    <div class="ov-stats-row">
+      <div class="ov-stat"><div class="v" id="ov-sess-done">—</div><div class="l">Sessions done</div></div>
+      <div class="ov-stat"><div class="v" id="ov-phase-end">—</div><div class="l">Phase ends</div></div>
+      <div class="ov-stat"><div class="v" id="ov-prog-end">—</div><div class="l">Program ends</div></div>
+    </div>
+  </div>
+
+  <div class="ov-section">
+    <div class="ov-sec-label">Phases</div>
+    <div id="ov-phases"></div>
+  </div>
+
+  <div class="ov-section">
+    <div class="ov-sec-label">Workout Calendar</div>
+    <div class="cal-wrap" id="ov-calendar"></div>
+  </div>
+
+  <div class="ov-section">
+    <div class="ov-sec-label">Notes from Program PDF</div>
+    <div class="pdf-notes-list" id="ov-pdf-notes"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     ONBOARDING
+═══════════════════════════ -->
+
+<div id="screen-onboarding" class="screen active">
+
+  <!-- Step 0: Program picker -->
+
+  <div class="ob-step active" id="obs-0">
+    <div class="ob-eyebrow">Forge</div>
+    <div class="ob-title">Your program.<br>Your weights.<br>Zero guessing.</div>
+    <div class="ob-sub">Select a program to begin.</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px">Available Programs</div>
+
+```
+<!-- MAPS Anabolic -->
+<div class="ob-prog-card" onclick="selectProgram('anabolic')" style="margin-bottom:10px">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+    <div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text);line-height:1">MAPS Anabolic</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:3px">Mind Pump Media</div>
+    </div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,229,255,0.2);padding:3px 9px;border-radius:4px;flex-shrink:0">Strength</div>
+  </div>
+  <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">Pre-Phase · Phase I · Phase II · Phase III</div>
+  <div style="display:flex;gap:20px;padding-top:10px;border-top:1px solid var(--border)">
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:var(--accent)">12</div><div style="font-size:10px;color:var(--text-muted)">WEEKS</div></div>
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:var(--accent)">4</div><div style="font-size:10px;color:var(--text-muted)">PHASES</div></div>
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:var(--accent)">2–3×</div><div style="font-size:10px;color:var(--text-muted)">PER WEEK</div></div>
+  </div>
+</div>
+
+<!-- MAPS Symmetry -->
+<div class="ob-prog-card" onclick="selectProgram('symmetry')" style="margin-bottom:10px">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+    <div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text);line-height:1">MAPS Symmetry</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:3px">Mind Pump Media</div>
+    </div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#a78bfa;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);padding:3px 9px;border-radius:4px;flex-shrink:0">Balance</div>
+  </div>
+  <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">Phase I · Phase II · Phase III · Phase IV</div>
+  <div style="display:flex;gap:20px;padding-top:10px;border-top:1px solid var(--border)">
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#a78bfa">11</div><div style="font-size:10px;color:var(--text-muted)">WEEKS</div></div>
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#a78bfa">4</div><div style="font-size:10px;color:var(--text-muted)">PHASES</div></div>
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#a78bfa">3×</div><div style="font-size:10px;color:var(--text-muted)">PER WEEK</div></div>
+  </div>
+</div>
+
+<!-- MAPS Performance -->
+<div class="ob-prog-card" onclick="selectProgram('performance')" style="margin-bottom:10px">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+    <div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text);line-height:1">MAPS Performance</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:3px">Mind Pump Media</div>
+    </div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);padding:3px 9px;border-radius:4px;flex-shrink:0">Athletic</div>
+  </div>
+  <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">Phase I · Phase II · Phase III · Phase IV</div>
+  <div style="display:flex;gap:20px;padding-top:10px;border-top:1px solid var(--border)">
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#4ade80">12</div><div style="font-size:10px;color:var(--text-muted)">WEEKS</div></div>
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#4ade80">4</div><div style="font-size:10px;color:var(--text-muted)">PHASES</div></div>
+    <div><div style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#4ade80">3×</div><div style="font-size:10px;color:var(--text-muted)">PER WEEK</div></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- Step 1: Working maxes (all programs use these for weight suggestions) -->
+
+  <div class="ob-step" id="obs-1">
+    <button class="ob-back-btn" onclick="goOb(0)">‹ Programs</button>
+    <div class="ob-eyebrow" id="obs1-eyebrow" style="margin-top:16px">Step 1 of 2</div>
+    <div class="ob-title">Your working maxes</div>
+    <div class="ob-sub" id="obs1-sub">Enter the most you've lifted for a heavy set of 3–5 reps. Used to calculate starting weights for every exercise.</div>
+    <div class="input-group">
+      <label class="input-label">Barbell Squat</label>
+      <div class="input-row" id="ir-squat"><input type="number" id="mx-squat" placeholder="225" inputmode="numeric"><span class="input-unit">LB</span></div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Barbell Deadlift</label>
+      <div class="input-row" id="ir-dead"><input type="number" id="mx-dead" placeholder="275" inputmode="numeric"><span class="input-unit">LB</span></div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Barbell Bench Press</label>
+      <div class="input-row" id="ir-bench"><input type="number" id="mx-bench" placeholder="185" inputmode="numeric"><span class="input-unit">LB</span></div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Overhead Press</label>
+      <div class="input-row" id="ir-ohp"><input type="number" id="mx-ohp" placeholder="135" inputmode="numeric"><span class="input-unit">LB</span></div>
+    </div>
+    <div id="perf-intensity-note" style="display:none;margin-bottom:16px;padding:12px 14px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:10px;font-size:13px;color:var(--text-dim);line-height:1.5">
+      💡 MAPS Performance tracks <strong style="color:#4ade80">intensity %</strong> rather than absolute weight. Your 1RMs above will be used to calculate target loads at 60–90% intensity per phase.
+    </div>
+    <button class="btn-primary" style="margin-top:8px" onclick="obNext()">Next →</button>
+  </div>
+
+  <!-- Step 2: Cadence -->
+
+  <div class="ob-step" id="obs-2">
+    <button class="ob-back-btn" onclick="goOb(1)">‹ Working Maxes</button>
+    <div class="ob-eyebrow" id="obs2-eyebrow" style="margin-top:16px">Step 2 of 2</div>
+    <div class="ob-title">Training cadence</div>
+    <div class="ob-sub">How many foundational workouts per week?</div>
+    <div id="cadence-blocks"></div>
+    <button class="btn-primary" style="margin-top:8px" onclick="obNext()">Start Training</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     WORKOUT
+═══════════════════════════ -->
+
+<div id="screen-workout" class="screen">
+  <div class="wo-breadcrumb">
+    <span class="wo-bc-link" onclick="goScreen('screen-home')">Home</span>
+    <span class="wo-bc-sep">›</span>
+    <span class="wo-bc-link" id="wo-bc-prog" onclick="goScreen('screen-overview')">MAPS Anabolic</span>
+    <span class="wo-bc-sep">›</span>
+    <span class="wo-bc-cur" id="wo-bc-cur">Workout</span>
+  </div>
+  <div class="workout-header">
+    <div class="phase-row">
+      <div class="phase-badge" id="phase-badge">Pre-Phase</div>
+      <div class="session-lbl" id="session-lbl">Session 1 of 9</div>
+    </div>
+    <div class="workout-title" id="workout-title">Foundational Workout</div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label">
+      <span id="prog-left">0 of 9 done</span>
+      <span id="prog-pct">0%</span>
+    </div>
+  </div>
+  <div class="ex-list" id="ex-list"></div>
+  <div class="bottom-bar">
+    <button class="finish-btn" id="finish-btn" disabled onclick="finishWorkout()">Finish Workout</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     SUMMARY
+═══════════════════════════ -->
+
+<div id="screen-summary" class="screen">
+  <div class="sum-wrap">
+    <div class="sum-eyebrow">✓ Session Complete</div>
+    <div class="sum-title" id="sum-title">Pre-Phase<br>Session 1</div>
+    <div class="sum-sub" id="sum-sub"></div>
+
+```
+<div class="sec-label" id="sum-orm-label">Estimated 1RM</div>
+<div class="orm-card">
+  <div class="orm-card-hdr" id="sum-orm-hdr">Based on today's heaviest sets · Epley formula</div>
+  <div id="orm-rows"></div>
+</div>
+
+<div class="next-up-card">
+  <div style="font-size:22px">📅</div>
+  <div>
+    <div class="next-up-inner-label">Up Next</div>
+    <div class="next-up-val" id="next-up-val"></div>
+  </div>
+</div>
+
+<div class="sec-label" id="sum-wts-label">Weights for next session</div>
+<div class="wts-card" id="wts-card"></div>
+
+<button class="btn-primary" style="margin-top:6px" onclick="startNext()">Start Next Session</button>
+<button class="btn-secondary" onclick="goScreen('screen-workout')">Back to Workout</button>
+```
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════
+const SB_URL = 'https://dbnkkournwhgnguugbnq.supabase.co';
+const SB_KEY = 'YOUR_SUPABASE_ANON_KEY'; // replace with anon key from Supabase dashboard → Settings → API
+
+async function sbFetch(path, method='GET', body=null){
+  const opts = {
+    method,
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method==='POST' ? 'return=representation' : ''
+    }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(SB_URL + path, opts);
+    if(!res.ok){ console.warn('Supabase error:', res.status, await res.text()); return null; }
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  } catch(e){ console.warn('sbFetch network error:', e); return null; }
+}
+
+// ═══════════════════════════════════════
+// MULTI-PROGRAM REGISTRY
+// trackingMode: "weight" | "intensity" | "checklist"
+// ═══════════════════════════════════════
+const ALL_PROGRAMS = {};
+
+// ─── MAPS ANABOLIC ───────────────────────────────────────────────────────────
+ALL_PROGRAMS['anabolic'] = {
+  id: 'anabolic',
+  name: 'MAPS Anabolic',
+  publisher: 'Mind Pump Media',
+  tagline: '12 weeks · Strength & Hypertrophy',
+  tag: 'Strength',
+  weeks: 12,
+  trackingMode: 'weight',
+  phaseOrder: ["prephase","phase1","phase2","phase3"],
+  phaseNames: {prephase:"Pre-Phase",phase1:"Phase I",phase2:"Phase II",phase3:"Phase III"},
+  phaseMeta: {
+    prephase:{ focus:"Foundation & movement prep · 12–16 reps", notes:["Single workout — not alternating Day 1/Day 2","12–16 rep range across all exercises","Goal: establish movement patterns and baseline"] },
+    phase1:  { focus:"Strength · 1–4 reps · 4–6 sets", notes:["Alternating Day 1 / Day 2 structure","Variable set range: work up to 6 sets before adding weight","Heavy compound: Squat, Bench, Deadlift, OHP","Weighted Pull-Ups included — negative = assisted mode"] },
+    phase2:  { focus:"Hypertrophy · 8–12 reps", notes:["Standard alternating Day 1 / Day 2","Top of rep range on all sets = add weight next session","Load drops to ~65–75% of 1RM from Phase I"] },
+    phase3:  { focus:"Metabolic pump · 12–15 reps", notes:["Highest rep range — 55–65% of 1RM","Supersets appear in Day 2","Trigger sessions increase in importance this phase","Finish line: 84-day program complete"] }
+  },
+  pdfNotes: [
+    "Zero explicit progression rules in the PDF — all progression logic is app-supplied.",
+    "Trigger sessions (mobility/pump work) are part of the program but not tracked for weight progression.",
+    "Warmup exercises (Box Squats, Good Mornings) are shown before main lifts but not logged.",
+    "Deload or rest weeks are not specified — rest as needed between phases.",
+    "Pre-Phase has a unique structure: single repeating workout (not alternating Day 1/Day 2 like the other phases).",
+    "Phase I variable set ranges (4–6 sets) are a key progression mechanic — hitting all 6 sets at a weight unlocks the load increase."
+  ],
+  onboarding: 'maxes',
+  phases: {
+    prephase: {
+    name:"Pre-Phase", weeks:3, defDays:2,
+    type:"single",
+    progression:"standard",
+    workout:[
+      {id:"pp1",  name:"Barbell Squats",             sets:2, rMin:12, rMax:16, anchor:"squat", pct:0.55},
+      {id:"pp2",  name:"Walking Lunges",             sets:1, rMin:16, rMax:20, anchor:"squat", pct:0.30},
+      {id:"pp3",  name:"Barbell Deadlift",           sets:1, rMin:8,  rMax:12, anchor:"dead",  pct:0.55},
+      {id:"pp4",  name:"Barbell Bench Press",        sets:2, rMin:12, rMax:16, anchor:"bench", pct:0.55},
+      {id:"pp5",  name:"Dumbbell Rows",              sets:2, rMin:12, rMax:16, anchor:"dead",  pct:0.35, db:true},
+      {id:"pp6",  name:"Dumbbell Shrugs",            sets:2, rMin:12, rMax:16, anchor:"dead",  pct:0.25, db:true},
+      {id:"pp7",  name:"Standing DB Shoulder Press", sets:2, rMin:12, rMax:16, anchor:"ohp",   pct:0.55},
+      {id:"pp8",  name:"Rear Delt Flyes",            sets:1, rMin:12, rMax:16, anchor:"bench", pct:0.20, db:true},
+      {id:"pp9",  name:"Barbell Curls",              sets:2, rMin:12, rMax:16, anchor:"bench", pct:0.30},
+      {id:"pp10", name:"Tricep Pressdown",           sets:2, rMin:12, rMax:16, anchor:"bench", pct:0.28},
+      {id:"pp11", name:"Isometric Planks",           sets:2, rMin:30, rMax:60, anchor:null, bw:true, unit:"sec"},
+      {id:"pp12", name:"Bodyweight Calf Raises",     sets:2, rMin:20, rMax:40, anchor:null, bw:true},
+    ]
+  },
+  phase1: {
+    name:"Phase I", weeks:3, defDays:2,
+    type:"alternating",
+    progression:"variable",
+    day1:[
+      {id:"p1d1_1", name:"Box Squats",                  sets:1, rMin:10, rMax:10, anchor:null, bw:true, warmup:true},
+      {id:"p1d1_2", name:"Barbell Squats",               sets:6, setsMin:4, rMin:1, rMax:4, anchor:"squat", pct:0.87},
+      {id:"p1d1_3", name:"Barbell Bench Press",          sets:6, setsMin:4, rMin:1, rMax:4, anchor:"bench", pct:0.87},
+      {id:"p1d1_4", name:"Weighted Pull-Ups",            sets:2, rMin:1, rMax:6, anchor:"squat", pct:0.10, addedWeight:true, note:"+ = added plate, 0 = strict BW, − = band assist (e.g. -50 lb)"},
+      {id:"p1d1_5", name:"Barbell Shrugs",               sets:3, rMin:3, rMax:6, anchor:"dead",  pct:0.60},
+      {id:"p1d1_6", name:"Barbell Curls",                sets:2, rMin:6, rMax:8, anchor:"bench", pct:0.32},
+      {id:"p1d1_7", name:"Barbell Skull Crushers",       sets:2, rMin:6, rMax:8, anchor:"bench", pct:0.30},
+      {id:"p1d1_8", name:"Weighted Decline Sit-Ups",     sets:5, rMin:8, rMax:12, anchor:null, bw:true},
+      {id:"p1d1_9", name:"Standing Calf Raises",         sets:5, rMin:8, rMax:20, anchor:null, bw:true},
+    ],
+    day2:[
+      {id:"p1d2_1", name:"Good Mornings",                sets:1, rMin:10, rMax:10, anchor:"dead", pct:0.30, warmup:true},
+      {id:"p1d2_2", name:"Barbell Deadlifts",             sets:6, setsMin:4, rMin:1, rMax:4, anchor:"dead",  pct:0.87},
+      {id:"p1d2_3", name:"Standing Overhead Barbell Press",sets:6, setsMin:4, rMin:1, rMax:4, anchor:"ohp", pct:0.87},
+      {id:"p1d2_4", name:"Rear Delt Flyes",               sets:2, rMin:6, rMax:8, anchor:"bench", pct:0.20, db:true},
+      {id:"p1d2_5", name:"Standing Dumbbell Shrugs",      sets:2, rMin:6, rMax:8, anchor:"dead",  pct:0.25, db:true},
+      {id:"p1d2_6", name:"Dumbbell Hammer Curls",         sets:2, rMin:6, rMax:8, anchor:"bench", pct:0.30, db:true},
+      {id:"p1d2_7", name:"DB Overhead Tricep Extension",  sets:2, rMin:6, rMax:8, anchor:"bench", pct:0.28, db:true},
+      {id:"p1d2_8", name:"Hanging Leg Raises",            sets:5, rMin:8, rMax:20, anchor:null, bw:true},
+      {id:"p1d2_9", name:"Seated Calf Raises",            sets:3, rMin:8, rMax:20, anchor:null, bw:true},
+    ]
+  },
+  phase2: {
+    name:"Phase II", weeks:3, defDays:2,
+    type:"alternating",
+    progression:"standard",
+    day1:[
+      {id:"p2d1_1",  name:"Barbell Squats",              sets:3, rMin:8,  rMax:12, anchor:"squat", pct:0.70},
+      {id:"p2d1_2",  name:"Incline Barbell Chest Press", sets:3, rMin:8,  rMax:12, anchor:"bench", pct:0.68},
+      {id:"p2d1_3",  name:"Barbell Rows",                sets:3, rMin:8,  rMax:12, anchor:"dead",  pct:0.55},
+      {id:"p2d1_4",  name:"Standing Dumbbell Shrugs",    sets:3, rMin:8,  rMax:12, anchor:"dead",  pct:0.28, db:true},
+      {id:"p2d1_5",  name:"Rear Delt Flyes",             sets:2, rMin:8,  rMax:12, anchor:"bench", pct:0.20, db:true},
+      {id:"p2d1_6",  name:"Lateral Raise",               sets:2, rMin:8,  rMax:12, anchor:"ohp",   pct:0.18, db:true},
+      {id:"p2d1_7",  name:"Dumbbell Supinating Curls",   sets:3, rMin:8,  rMax:12, anchor:"bench", pct:0.28, db:true},
+      {id:"p2d1_8",  name:"Weighted Dips",               sets:3, rMin:8,  rMax:12, anchor:"bench", pct:0.15, addedWeight:true, note:"+ = added plate, 0 = BW, − = band assist"},
+      {id:"p2d1_9",  name:"Seated Calf Raises",          sets:3, rMin:8,  rMax:12, anchor:null, bw:true},
+      {id:"p2d1_10", name:"Hanging Leg Raises",          sets:3, rMin:8,  rMax:20, anchor:null, bw:true},
+    ],
+    day2:[
+      {id:"p2d2_1",  name:"Barbell Deadlifts",           sets:3, rMin:4,  rMax:8,  anchor:"dead",  pct:0.80},
+      {id:"p2d2_2",  name:"Lying Leg Curls",             sets:1, rMin:8,  rMax:12, anchor:"dead",  pct:0.35},
+      {id:"p2d2_3",  name:"Barbell Shrugs",              sets:3, rMin:8,  rMax:12, anchor:"dead",  pct:0.60},
+      {id:"p2d2_4",  name:"Flat Dumbbell Chest Press",   sets:3, rMin:8,  rMax:12, anchor:"bench", pct:0.55, db:true},
+      {id:"p2d2_5",  name:"Dumbbell Pullover",           sets:1, rMin:8,  rMax:12, anchor:"dead",  pct:0.22, db:true},
+      {id:"p2d2_6",  name:"Bodyweight Chin-Ups",         sets:2, rMin:6,  rMax:12, anchor:null, bw:true},
+      {id:"p2d2_7",  name:"Dumbbell Shoulder Press",     sets:3, rMin:8,  rMax:12, anchor:"ohp",   pct:0.55, db:true},
+      {id:"p2d2_8",  name:"Barbell Curls",               sets:3, rMin:8,  rMax:12, anchor:"bench", pct:0.32},
+      {id:"p2d2_9",  name:"Tricep Pressdowns",           sets:3, rMin:8,  rMax:12, anchor:"bench", pct:0.28},
+      {id:"p2d2_10", name:"Standing Calf Raises",        sets:3, rMin:8,  rMax:12, anchor:null, bw:true},
+      {id:"p2d2_11", name:"Bodyweight Decline Sit-Ups",  sets:3, rMin:30, rMax:100,anchor:null, bw:true},
+    ]
+  },
+  phase3: {
+    name:"Phase III", weeks:3, defDays:2,
+    type:"alternating",
+    progression:"standard",
+    day1:[
+      {id:"p3d1_1",  name:"Barbell Squats",              sets:4, rMin:12, rMax:15, anchor:"squat", pct:0.62},
+      {id:"p3d1_2",  name:"Leg Press",                   sets:3, rMin:12, rMax:15, anchor:"squat", pct:0.75},
+      {id:"p3d1_3",  name:"Walking Lunges",              sets:2, rMin:12, rMax:15, anchor:"squat", pct:0.28},
+      {id:"p3d1_4",  name:"Incline DB Chest Press",      sets:3, rMin:12, rMax:15, anchor:"bench", pct:0.52, db:true},
+      {id:"p3d1_5",  name:"Flat Barbell Chest Press",    sets:3, rMin:12, rMax:15, anchor:"bench", pct:0.58},
+      {id:"p3d1_6",  name:"Cable Chest Flyes",           sets:2, rMin:12, rMax:15, anchor:"bench", pct:0.22},
+      {id:"p3d1_7",  name:"Dumbbell Supinating Curls",   sets:3, rMin:12, rMax:15, anchor:"bench", pct:0.25, db:true},
+      {id:"p3d1_8",  name:"Hammer Curls",                sets:2, rMin:12, rMax:15, anchor:"bench", pct:0.25, db:true},
+      {id:"p3d1_9",  name:"Seated Calf Raises",          sets:4, rMin:12, rMax:20, anchor:null, bw:true},
+      {id:"p3d1_10", name:"Isometric Planks",            sets:3, rMin:30, rMax:60, anchor:null, bw:true, unit:"sec"},
+    ],
+    day2:[
+      {id:"p3d2_1",  name:"Good Mornings",               sets:1, rMin:10, rMax:10, anchor:"dead", pct:0.30, warmup:true},
+      {id:"p3d2_2",  name:"Barbell Deadlifts",            sets:3, rMin:8,  rMax:12, anchor:"dead",  pct:0.72},
+      {id:"p3d2_3",  name:"Barbell Rows",                 sets:3, rMin:12, rMax:15, anchor:"dead",  pct:0.52},
+      {id:"p3d2_4",  name:"Dumbbell Pullover",            sets:2, rMin:12, rMax:15, anchor:"dead",  pct:0.22, db:true},
+      {id:"p3d2_5",  name:"Bodyweight Chin-Ups",          sets:3, rMin:6,  rMax:12, anchor:null, bw:true},
+      {id:"p3d2_6",  name:"Dumbbell Shoulder Press",      sets:3, rMin:12, rMax:15, anchor:"ohp",   pct:0.52, db:true},
+      {id:"p3d2_7",  name:"Lateral Raise",                sets:3, rMin:12, rMax:15, anchor:"ohp",   pct:0.18, db:true},
+      {id:"p3d2_8",  name:"Rear Delt Flyes",              sets:2, rMin:12, rMax:15, anchor:"bench", pct:0.18, db:true},
+      {id:"p3d2_9",  name:"Weighted Dips",                sets:3, rMin:12, rMax:15, anchor:"bench", pct:0.12, addedWeight:true, note:"+ = added plate, 0 = BW, − = band assist"},
+      {id:"p3d2_ss1", superset:true, sets:2, exA:{id:"p3d2_ss1a", name:"Hammer Curls",         rMin:12, rMax:15, anchor:"bench", pct:0.25, db:true}, exB:{id:"p3d2_ss1b", name:"DB Skull Crushers",    rMin:12, rMax:15, anchor:"bench", pct:0.22, db:true}},
+      {id:"p3d2_ss2", superset:true, sets:2, exA:{id:"p3d2_ss2a", name:"Barbell Curls",         rMin:12, rMax:15, anchor:"bench", pct:0.32},          exB:{id:"p3d2_ss2b", name:"Bench Dips",            rMin:12, rMax:15, anchor:null,    bw:true}},
+      {id:"p3d2_11", name:"Standing Calf Raises",         sets:4, rMin:12, rMax:20, anchor:null, bw:true},
+      {id:"p3d2_12", name:"Bodyweight Decline Sit-Ups",   sets:3, rMin:30, rMax:100,anchor:null, bw:true},
+    ]
+  }
+  } // end phases
+}; // end anabolic
+
+// ─── MAPS SYMMETRY ───────────────────────────────────────────────────────────
+ALL_PROGRAMS['symmetry'] = {
+  id: 'symmetry',
+  name: 'MAPS Symmetry',
+  publisher: 'Mind Pump Media',
+  tagline: '11 weeks · Muscle Balance & Symmetry',
+  tag: 'Balance',
+  weeks: 11,
+  trackingMode: 'weight',
+  phaseOrder: ["sym_p1","sym_p2","sym_p3","sym_p4"],
+  phaseNames: {sym_p1:"Phase I",sym_p2:"Phase II",sym_p3:"Phase III",sym_p4:"Phase IV"},
+  phaseMeta: {
+    sym_p1: { focus:"Stability & control · holds + 2×10", notes:["2 weeks · 3×/wk foundational + 2×/wk mobility","Mix of hold exercises (timed) and rep-based","Unilateral focus throughout — always start with weaker side","Performance Mobility Sessions alternate with foundational workouts"] },
+    sym_p2: { focus:"Muscle balance · 2×10 each arm/leg", notes:["3 weeks · 3 alternating foundational workouts","All exercises are unilateral (single-arm/leg)","2×10 each arm or leg for all exercises","Mobility Sessions 3 & 4 cycle with foundational workouts"] },
+    sym_p3: { focus:"Strength sculpt · 2×8 reps", notes:["3 weeks · 3 alternating foundational workouts","Drops to 2×8 reps — heavier than Phase II","Trigger Sessions replace mobility sessions (from Anabolic program)","Core & Calf block added after each workout"] },
+    sym_p4: { focus:"Maximal strength · 5×5", notes:["3 weeks · Big 3 barbell focus","5×5 on Squat, Bench, Row / OHP, Deadlift / Front Squat, Chin-Ups","Focus sessions: choose a lagging body part (3 sets, 10–12 reps)","Rest up to 3 minutes between sets"] }
+  },
+  pdfNotes: [
+    "Always start with the weaker side on all unilateral exercises.",
+    "Phase I & II use Performance Mobility Sessions — not weight-based, not tracked for progression.",
+    "Phase III uses MAPS Anabolic Trigger Sessions instead of mobility sessions.",
+    "Phase IV uses MAPS Aesthetic Focus Sessions — choose your own lagging body part to target.",
+    "Hold exercises are timed (seconds), not rep-counted — tracked as bodyweight.",
+    "The calendar is 5 days per week (alternating foundational + mobility)."
+  ],
+  onboarding: 'maxes',
+  phases: {
+    sym_p1: {
+      name:"Phase I", weeks:2, defDays:3,
+      type:"triple",
+      progression:"standard",
+      workout1:[
+        {id:"s1w1_1",  name:"Dunphy Squat Hold",              sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_2",  name:"Hip Bridge Hold",                sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_3",  name:"Single-Leg Suspension Squat",    sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s1w1_4",  name:"Single-Leg Toe Touch",           sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s1w1_5",  name:"Suspension Fly Hold",            sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_6",  name:"Suspension Extended Fly Hold",   sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_7",  name:"Suspension Anchor Push-Up",      sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each arm"},
+        {id:"s1w1_8",  name:"Hanging Iso-Lat Stretch",        sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_9",  name:"Suspension Row Hold",            sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_10", name:"Single-Arm Suspension Row",      sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each arm"},
+        {id:"s1w1_11", name:"Thread The Needle Iso-Smash",    sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec", note:"Each side"},
+        {id:"s1w1_12", name:"Suspension W Hold",              sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_13", name:"Suspension Crocodile I",         sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each side"},
+        {id:"s1w1_14", name:"Wrist CARS Quadruped",           sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_15", name:"Bicep Squeeze",                  sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_16", name:"Suspension Curls",               sets:2, rMin:10, rMax:10, anchor:null, bw:true},
+        {id:"s1w1_17", name:"Skull Crusher Iso-Hold",         sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_18", name:"Diamond Hold",                   sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w1_19", name:"Suspension Skull Crusher",       sets:2, rMin:10, rMax:10, anchor:null, bw:true},
+      ],
+      workout2:[
+        {id:"s1w2_1",  name:"Dunphy Squat Hold",              sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_2",  name:"Hip Bridge Hold",                sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_3",  name:"Single-Leg Suspension Squat",    sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s1w2_4",  name:"Single-Leg Toe Touch",           sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s1w2_5",  name:"Suspension Fly Hold",            sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_6",  name:"Suspension Extended Fly Hold",   sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_7",  name:"Suspension Anchor Push-Up",      sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each arm"},
+        {id:"s1w2_8",  name:"Hanging Iso-Lat Stretch",        sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_9",  name:"Suspension Row Hold",            sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_10", name:"Single-Arm Suspension Row",      sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each arm"},
+        {id:"s1w2_11", name:"Thread The Needle Iso-Smash",    sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec", note:"Each side"},
+        {id:"s1w2_12", name:"Suspension W Hold",              sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_13", name:"Suspension Crocodile I",         sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each side"},
+        {id:"s1w2_14", name:"Wrist CARS Quadruped",           sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_15", name:"Bicep Squeeze",                  sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_16", name:"Suspension Curls",               sets:2, rMin:10, rMax:10, anchor:null, bw:true},
+        {id:"s1w2_17", name:"Skull Crusher Iso-Hold",         sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_18", name:"Diamond Hold",                   sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w2_19", name:"Suspension Skull Crusher",       sets:2, rMin:10, rMax:10, anchor:null, bw:true},
+      ],
+      workout3:[
+        {id:"s1w3_1",  name:"Dunphy Squat Hold",              sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_2",  name:"Hip Bridge Hold",                sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_3",  name:"Single-Leg Suspension Squat",    sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s1w3_4",  name:"Single-Leg Toe Touch",           sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s1w3_5",  name:"Suspension Fly Hold",            sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_6",  name:"Suspension Extended Fly Hold",   sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_7",  name:"Suspension Anchor Push-Up",      sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each arm"},
+        {id:"s1w3_8",  name:"Hanging Iso-Lat Stretch",        sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_9",  name:"Suspension Row Hold",            sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_10", name:"Single-Arm Suspension Row",      sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each arm"},
+        {id:"s1w3_11", name:"Thread The Needle Iso-Smash",    sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec", note:"Each side"},
+        {id:"s1w3_12", name:"Suspension W Hold",              sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_13", name:"Suspension Crocodile I",         sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each side"},
+        {id:"s1w3_14", name:"Wrist CARS Quadruped",           sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_15", name:"Bicep Squeeze",                  sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_16", name:"Suspension Curls",               sets:2, rMin:10, rMax:10, anchor:null, bw:true},
+        {id:"s1w3_17", name:"Skull Crusher Iso-Hold",         sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_18", name:"Diamond Hold",                   sets:2, rMin:15, rMax:15, anchor:null, bw:true, unit:"sec"},
+        {id:"s1w3_19", name:"Suspension Skull Crusher",       sets:2, rMin:10, rMax:10, anchor:null, bw:true},
+      ]
+    },
+    sym_p2: {
+      name:"Phase II", weeks:3, defDays:3,
+      type:"triple",
+      progression:"standard",
+      workout1:[
+        {id:"s2w1_1",  name:"Single-Leg Cable Hinge",         sets:2, rMin:10, rMax:10, anchor:"dead",  pct:0.20, note:"Each leg"},
+        {id:"s2w1_2",  name:"Dumbbell Bulgarian Split Squat", sets:2, rMin:10, rMax:10, anchor:"squat", pct:0.25, db:true, note:"Each leg"},
+        {id:"s2w1_3",  name:"Alternating Cable Crossover",    sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.15, note:"Each arm"},
+        {id:"s2w1_4",  name:"Incline Alternating DB Press",   sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.40, db:true, note:"Each arm"},
+        {id:"s2w1_5",  name:"Seated Single-Arm Cable Row",    sets:2, rMin:10, rMax:10, anchor:"dead",  pct:0.22, note:"Each arm"},
+        {id:"s2w1_6",  name:"Single-Arm Dumbbell Row",        sets:2, rMin:10, rMax:10, anchor:"dead",  pct:0.35, db:true, note:"Each arm"},
+        {id:"s2w1_7",  name:"Single-Arm Cable Fly",           sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.12, note:"Each arm"},
+        {id:"s2w1_8",  name:"Seated Single-Arm Arnold Press", sets:2, rMin:10, rMax:10, anchor:"ohp",   pct:0.35, db:true, note:"Each arm"},
+        {id:"s2w1_9",  name:"Alternating Cable Curls",        sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.14, note:"Each arm"},
+        {id:"s2w1_10", name:"Alternating Incline DB Curls",   sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.20, db:true, note:"Each arm"},
+        {id:"s2w1_11", name:"Single-Arm Cable Kickbacks",     sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.10, note:"Each arm"},
+        {id:"s2w1_12", name:"Incline Alt DB Skull Crusher",   sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.22, db:true, note:"Each arm"},
+      ],
+      workout2:[
+        {id:"s2w2_1",  name:"Cable Reverse Lunge to Balance", sets:2, rMin:10, rMax:10, anchor:"squat", pct:0.18, note:"Each leg"},
+        {id:"s2w2_2",  name:"Single-Leg Step-Up",             sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s2w2_3",  name:"Single-Arm Low Cable Crossover", sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.12, note:"Each arm"},
+        {id:"s2w2_4",  name:"Alternating DB Chest Press",     sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.45, db:true, note:"Each arm"},
+        {id:"s2w2_5",  name:"Floor Seated Cable Pulldown",    sets:2, rMin:10, rMax:10, anchor:"dead",  pct:0.25, note:"Each arm"},
+        {id:"s2w2_6",  name:"Chest Supported Incline DB Row", sets:2, rMin:10, rMax:10, anchor:"dead",  pct:0.32, db:true},
+        {id:"s2w2_7",  name:"Single-Arm Cable Upright Row",   sets:2, rMin:10, rMax:10, anchor:"ohp",   pct:0.18, note:"Each arm"},
+        {id:"s2w2_8",  name:"Alternating Lateral Raise",      sets:2, rMin:10, rMax:10, anchor:"ohp",   pct:0.14, db:true, note:"Each arm"},
+        {id:"s2w2_9",  name:"Alternating Cable Curls",        sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.14, note:"Each arm"},
+        {id:"s2w2_10", name:"Single-Arm Preacher Curl",       sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.18, note:"Each arm"},
+        {id:"s2w2_11", name:"Single-Arm Cable Tricep Ext",    sets:3, rMin:10, rMax:10, anchor:"bench", pct:0.12, note:"Each arm"},
+        {id:"s2w2_12", name:"Flat Bench Alt Skull Crushers",  sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.22, db:true, note:"Each arm"},
+      ],
+      workout3:[
+        {id:"s2w3_1",  name:"Single-Leg Get-Up",              sets:2, rMin:10, rMax:10, anchor:null, bw:true, note:"Each leg"},
+        {id:"s2w3_2",  name:"Walking Lunge",                  sets:2, rMin:10, rMax:10, anchor:"squat", pct:0.25, note:"Each leg"},
+        {id:"s2w3_3",  name:"Decline Alt Cable Chest Fly",    sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.12, note:"Each arm"},
+        {id:"s2w3_4",  name:"Incline Dumbbell Fly",           sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.28, db:true},
+        {id:"s2w3_5",  name:"Bentover Cable Pullover",        sets:2, rMin:10, rMax:10, anchor:"dead",  pct:0.22},
+        {id:"s2w3_6",  name:"Cross Bench DB Pullover",        sets:2, rMin:10, rMax:10, anchor:"dead",  pct:0.25, db:true},
+        {id:"s2w3_7",  name:"Floor Cable Lateral Raise",      sets:2, rMin:10, rMax:10, anchor:"ohp",   pct:0.12},
+        {id:"s2w3_8",  name:"Seated Alt DB Shoulder Press",   sets:2, rMin:10, rMax:10, anchor:"ohp",   pct:0.35, db:true, note:"Each arm"},
+        {id:"s2w3_9",  name:"Alternating Cable Hammer Curls", sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.14, note:"Each arm"},
+        {id:"s2w3_10", name:"Single-Arm Pushdown",            sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.12, note:"Each arm"},
+        {id:"s2w3_11", name:"Single-Arm Incline Cross-Body Skull Crusher", sets:2, rMin:10, rMax:10, anchor:"bench", pct:0.18, db:true, note:"Each arm"},
+      ]
+    },
+    sym_p3: {
+      name:"Phase III", weeks:3, defDays:3,
+      type:"triple",
+      progression:"standard",
+      workout1:[
+        {id:"s3w1_1",  name:"Barbell Walking Lunges",         sets:2, rMin:8,  rMax:8,  anchor:"squat", pct:0.40, note:"Each leg"},
+        {id:"s3w1_2",  name:"Single-Leg Romanian Deadlift",   sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.35, db:true, note:"Each leg"},
+        {id:"s3w1_3",  name:"Dumbbell Incline Chest Press",   sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.45, db:true},
+        {id:"s3w1_4",  name:"Dumbbell Flys",                  sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.25, db:true},
+        {id:"s3w1_5",  name:"Single-Arm Dumbbell Row",        sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.38, db:true, note:"Each arm"},
+        {id:"s3w1_6",  name:"Floor Seated Cable Pulldowns",   sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.28},
+        {id:"s3w1_7",  name:"Chest Down Incline Rear Fly",    sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.18, db:true},
+        {id:"s3w1_8",  name:"Standing Arnold Press",          sets:2, rMin:8,  rMax:8,  anchor:"ohp",   pct:0.38, db:true},
+        {id:"s3w1_9",  name:"Standing Alt Supinating DB Curl",sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.25, db:true, note:"Each arm"},
+        {id:"s3w1_10", name:"Concentration Curl",             sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.22, db:true, note:"Each arm"},
+        {id:"s3w1_11", name:"Seated Single-Arm Overhead Tri Ext",sets:2, rMin:8, rMax:8, anchor:"bench", pct:0.20, db:true, note:"Each arm"},
+        {id:"s3w1_12", name:"Dumbbell Skull Crushers",        sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.22, db:true},
+      ],
+      workout2:[
+        {id:"s3w2_1",  name:"DB Bulgarian Split Stance Squat",sets:2, rMin:6,  rMax:6,  anchor:"squat", pct:0.30, db:true},
+        {id:"s3w2_2",  name:"Cable Sissy Squat",              sets:2, rMin:8,  rMax:8,  anchor:null, bw:true},
+        {id:"s3w2_3",  name:"Dumbbell Press",                 sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.48, db:true},
+        {id:"s3w2_4",  name:"Incline Fly",                    sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.25, db:true},
+        {id:"s3w2_5",  name:"Two Arm Dumbbell Row",           sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.38, db:true},
+        {id:"s3w2_6",  name:"Single-Arm Downward Cable Rows", sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.22, note:"Each arm"},
+        {id:"s3w2_7",  name:"Dumbbell Upright Row",           sets:2, rMin:8,  rMax:8,  anchor:"ohp",   pct:0.28, db:true},
+        {id:"s3w2_8",  name:"Standing Cable Rear Fly",        sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.15},
+        {id:"s3w2_9",  name:"Alternating DB Hammer Curl",     sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.25, db:true, note:"Each arm"},
+        {id:"s3w2_10", name:"Dumbbell Drag Curls",            sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.22, db:true},
+        {id:"s3w2_11", name:"Alternating DB Tricep Press",    sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.28, db:true, note:"Each arm"},
+        {id:"s3w2_12", name:"Rope Pressdown",                 sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.20},
+      ],
+      workout3:[
+        {id:"s3w3_1",  name:"Dumbbell Step-Up",               sets:2, rMin:6,  rMax:6,  anchor:"squat", pct:0.28, db:true},
+        {id:"s3w3_2",  name:"Single-Leg DB Romanian Deadlift",sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.32, db:true, note:"Each leg"},
+        {id:"s3w3_3",  name:"Dumbbell Incline Press",         sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.45, db:true},
+        {id:"s3w3_4",  name:"Cable Crossover",                sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.18},
+        {id:"s3w3_5",  name:"Trap Bar Deadlifts",             sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.75},
+        {id:"s3w3_6",  name:"Chest Down Incline Row",         sets:2, rMin:8,  rMax:8,  anchor:"dead",  pct:0.32, db:true},
+        {id:"s3w3_7",  name:"Circus Press",                   sets:2, rMin:6,  rMax:6,  anchor:"ohp",   pct:0.40, db:true},
+        {id:"s3w3_8",  name:"Lateral Raise",                  sets:2, rMin:8,  rMax:8,  anchor:"ohp",   pct:0.15, db:true},
+        {id:"s3w3_9",  name:"Dumbbell Preacher Curls",        sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.22, db:true},
+        {id:"s3w3_10", name:"Dumbbell Spider Curls",          sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.20, db:true},
+        {id:"s3w3_11", name:"Dips",                           sets:2, rMin:8,  rMax:8,  anchor:null, bw:true},
+        {id:"s3w3_12", name:"Rope Overhead Tricep Extension", sets:2, rMin:8,  rMax:8,  anchor:"bench", pct:0.18},
+      ]
+    },
+    sym_p4: {
+      name:"Phase IV", weeks:3, defDays:3,
+      type:"triple",
+      progression:"standard",
+      workout1:[
+        {id:"s4w1_1", name:"Barbell Squat",   sets:5, rMin:5, rMax:5, anchor:"squat", pct:0.85},
+        {id:"s4w1_2", name:"Barbell Bench",   sets:5, rMin:5, rMax:5, anchor:"bench", pct:0.85},
+        {id:"s4w1_3", name:"Barbell Row",     sets:5, rMin:5, rMax:5, anchor:"dead",  pct:0.65},
+      ],
+      workout2:[
+        {id:"s4w2_1", name:"Barbell Overhead Press", sets:5, rMin:5, rMax:5, anchor:"ohp",   pct:0.85},
+        {id:"s4w2_2", name:"Barbell Deadlift",        sets:5, rMin:5, rMax:5, anchor:"dead",  pct:0.85},
+        {id:"s4w2_3", name:"Decline Sit-Ups",         sets:3, rMin:8, rMax:8, anchor:null, bw:true},
+      ],
+      workout3:[
+        {id:"s4w3_1", name:"Front Squat",             sets:5, rMin:5, rMax:5, anchor:"squat", pct:0.72},
+        {id:"s4w3_2", name:"Chin-Ups",                sets:5, rMin:5, rMax:5, anchor:null, bw:true},
+        {id:"s4w3_3", name:"Close Grip Bench Press",  sets:5, rMin:5, rMax:5, anchor:"bench", pct:0.80},
+      ]
+    }
+  }
+}; // end symmetry
+
+// ─── MAPS PERFORMANCE ────────────────────────────────────────────────────────
+ALL_PROGRAMS['performance'] = {
+  id: 'performance',
+  name: 'MAPS Performance',
+  publisher: 'Mind Pump Media',
+  tagline: '11–12 weeks · Athletic Strength',
+  tag: 'Athletic',
+  weeks: 12,
+  trackingMode: 'intensity',
+  phaseOrder: ["perf_p1","perf_p2","perf_p3","perf_p4"],
+  phaseNames: {perf_p1:"Phase I",perf_p2:"Phase II",perf_p3:"Phase III",perf_p4:"Phase IV"},
+  phaseMeta: {
+    perf_p1: { focus:"Raw Strength · 2–5 sets, 1–6 reps · 85–90% intensity", notes:["3 weeks · 3 foundational workouts/wk + daily mobility","Tempo: 5:1:1 (slow eccentric, pause, explosive concentric)","Heavy barbell focus: Squat, Deadlift, Bench, Press","3–5 min rest between foundational sets"] },
+    perf_p2: { focus:"Reactive Strength · 3–4 sets, 15–20 reps · 75–85%", notes:["3 weeks · alternating Day 1 / Day 2 foundational","Multi-planar movements, kettlebells, landmine work","Tempo: 2:0:2 · 30–90 sec rest between sets","Mobility sessions continue daily on off-days"] },
+    perf_p3: { focus:"Explosive Strength · 4 sets, 15–20 reps · 60–65%", notes:["3 weeks · alternating Day 1 / Day 2 foundational","Plyometrics, speed pulls, jumps — power focus","Tempo: 5:1:1 · 3–5 min rest","Mobility sessions continue daily on off-days"] },
+    perf_p4: { focus:"Strength Durability · circuits for time · 80–90%", notes:["2–3 weeks · alternating Day 1 / Day 2 foundational","Day 1: 4-cycle barbell circuit + 15 min intervals","Day 2: 4-cycle kettlebell complex","Continuous movement — rest = time to transition with composure"] }
+  },
+  pdfNotes: [
+    "Intensity % is the primary tracking metric, not absolute weight — targets shown are % of 1RM.",
+    "Mobility sessions run daily on all non-foundational workout days (20–45 min). Not tracked for progression.",
+    "Phase I has 3 distinct foundational workouts (Day 1, 2, 3). Phases II & III alternate between 2 workouts.",
+    "Phase IV workouts are circuit-based — logged as rounds/time, not traditional sets.",
+    "Tempo notation: 5:1:1 = 5s eccentric, 1s pause, 1s concentric.",
+    "Performance uses RPE and intensity % — weight suggestions are calculated from your entered 1RMs."
+  ],
+  onboarding: 'maxes',
+  phases: {
+    perf_p1: {
+      name:"Phase I", weeks:3, defDays:3,
+      type:"triple",
+      progression:"standard",
+      workout1:[
+        {id:"pp1d1_1", name:"Phase 1 Squat",                  sets:5, rMin:3, rMax:3, anchor:"squat", pct:0.87, trackingMode:"intensity", tempo:"5:1:1", note:"Fast explosive concentric, slow eccentric"},
+        {id:"pp1d1_2", name:"Phase 1 Bench Press",            sets:3, rMin:3, rMax:3, anchor:"bench", pct:0.87, trackingMode:"intensity", tempo:"5:1:1"},
+        {id:"pp1d1_3", name:"High Pull",                      sets:3, rMin:3, rMax:3, anchor:"dead",  pct:0.70, trackingMode:"intensity"},
+        {id:"pp1d1_4", name:"Weighted Pull-Ups",              sets:2, rMin:5, rMax:5, anchor:"squat", pct:0.10, addedWeight:true, note:"Full lockout quickly, neutral grip. + = plate, 0 = BW, − = band"},
+        {id:"pp1d1_5", name:"Overhead Press (Push Press)",    sets:3, rMin:3, rMax:6, anchor:"ohp",   pct:0.85, trackingMode:"intensity"},
+        {id:"pp1d1_6", name:"MAPS Side Chop",                 sets:3, rMin:15, rMax:20, anchor:null, bw:true, note:"Per side — medicine ball or cable"},
+      ],
+      workout2:[
+        {id:"pp1d2_1", name:"Phase 1 Deadlift",               sets:5, rMin:6, rMax:6, anchor:"dead",  pct:0.85, trackingMode:"intensity", note:"Ideally with bands"},
+        {id:"pp1d2_2", name:"Walking Lunges",                  sets:3, rMin:20, rMax:20, anchor:"squat", pct:0.25, note:"Loaded with kettlebells, barbell, or dumbbells"},
+        {id:"pp1d2_3", name:"Weighted Dips",                   sets:3, rMin:3, rMax:6, anchor:"bench", pct:0.15, trackingMode:"intensity"},
+        {id:"pp1d2_4", name:"MAPS Strength Row",               sets:3, rMin:3, rMax:6, anchor:"dead",  pct:0.50, trackingMode:"intensity"},
+        {id:"pp1d2_5", name:"One Arm KB Shoulder Press",       sets:3, rMin:3, rMax:6, anchor:"ohp",   pct:0.35, trackingMode:"intensity", note:"Per arm"},
+        {id:"pp1d2_6", name:"Downward Chop",                   sets:3, rMin:15, rMax:20, anchor:null, bw:true, note:"Per side"},
+      ],
+      workout3:[
+        {id:"pp1d3_1", name:"Front Squat",                     sets:3, rMin:3, rMax:6, anchor:"squat", pct:0.80, trackingMode:"intensity"},
+        {id:"pp1d3_2", name:"Incline Press",                   sets:3, rMin:3, rMax:6, anchor:"bench", pct:0.82, trackingMode:"intensity"},
+        {id:"pp1d3_3", name:"Single Arm Cable Row Split Stance",sets:3, rMin:10, rMax:12, anchor:"dead", pct:0.22, note:"Per arm"},
+        {id:"pp1d3_ss1", superset:true, sets:1,
+          exA:{id:"pp1d3_ss1a", name:"Rubber Band Pull-A-Parts (Heavy)", rMin:10, rMax:12, anchor:null, bw:true},
+          exB:{id:"pp1d3_ss1b", name:"MAPS External Rotation (Light Band)", rMin:15, rMax:20, anchor:null, bw:true}},
+        {id:"pp1d3_4", name:"MAPS Suitcase Carry",             sets:3, rMin:30, rMax:30, anchor:null, bw:true, unit:"sec", note:"Each direction — heavy weight you can stabilize"},
+      ]
+    },
+    perf_p2: {
+      name:"Phase II", weeks:3, defDays:3,
+      type:"alternating",
+      progression:"standard",
+      day1:[
+        {id:"pp2d1_1", name:"MAPS Matrix Lunges",              sets:4, rMin:18, rMax:18, anchor:"squat", pct:0.25, trackingMode:"intensity", note:"Each lunge counts as 1 rep"},
+        {id:"pp2d1_2", name:"Renegade Row to Push Up",         sets:4, rMin:10, rMax:15, anchor:null, bw:true},
+        {id:"pp2d1_3", name:"One Arm KB Squat Press",          sets:4, rMin:15, rMax:20, anchor:"ohp",   pct:0.30, trackingMode:"intensity"},
+        {id:"pp2d1_4", name:"MAPS Rotational Lunge",           sets:4, rMin:10, rMax:15, anchor:null, bw:true, note:"Each side"},
+        {id:"pp2d1_5", name:"Landmine Rotations",              sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+      ],
+      day2:[
+        {id:"pp2d2_1", name:"Phase 2 Squat",                   sets:4, rMin:15, rMax:20, anchor:"squat", pct:0.78, trackingMode:"intensity"},
+        {id:"pp2d2_2", name:"Kettlebell Single Leg Deadlift",  sets:4, rMin:15, rMax:20, anchor:"dead",  pct:0.22, trackingMode:"intensity"},
+        {id:"pp2d2_3", name:"MAPS High/Low Press",             sets:4, rMin:15, rMax:20, anchor:"ohp",   pct:0.30, trackingMode:"intensity"},
+        {id:"pp2d2_ss1", superset:true, sets:4,
+          exA:{id:"pp2d2_ss1a", name:"Bench Press",   rMin:4, rMax:6, anchor:"bench", pct:0.80, trackingMode:"intensity"},
+          exB:{id:"pp2d2_ss1b", name:"Push Up With Rotation", rMin:15, rMax:20, anchor:null, bw:true}},
+      ],
+      day3:[
+        {id:"pp2d3_1", name:"Zercher Squat",                   sets:4, rMin:15, rMax:20, anchor:"squat", pct:0.65, trackingMode:"intensity"},
+        {id:"pp2d3_2", name:"Dunphy Squat",                    sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp2d3_3", name:"Stick ISO Drivers",               sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp2d3_4", name:"Stick Single Arm ISO Chest",      sets:4, rMin:15, rMax:20, anchor:null, bw:true, note:"Each side"},
+        {id:"pp2d3_5", name:"Stick Lateral Drivers",           sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp2d3_6", name:"Supinated Pull-Ups",              sets:3, rMin:2, rMax:12, anchor:null, bw:true, note:"Stop 2 reps short of failure — assisted if needed"},
+      ]
+    },
+    perf_p3: {
+      name:"Phase III", weeks:3, defDays:2,
+      type:"alternating",
+      progression:"standard",
+      day1:[
+        {id:"pp3d1_1", name:"Box Jump",                        sets:4, rMin:10, rMax:15, anchor:null, bw:true, note:"Regain composure each rep"},
+        {id:"pp3d1_2", name:"Kettlebell Swings",               sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp3d1_3", name:"Ice Skaters",                     sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp3d1_4", name:"Plyo Push-Ups",                   sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp3d1_5", name:"Phase III Barbell Squat",         sets:4, rMin:15, rMax:20, anchor:"squat", pct:0.62, trackingMode:"intensity"},
+      ],
+      day2:[
+        {id:"pp3d2_1", name:"Single Arm Dumbbell Snatch",      sets:4, rMin:15, rMax:20, anchor:"dead",  pct:0.22, note:"Each arm"},
+        {id:"pp3d2_2", name:"Alternating Lunge Jumps",         sets:4, rMin:15, rMax:20, anchor:null, bw:true, note:"Each leg"},
+        {id:"pp3d2_3", name:"Band Speed Row",                  sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp3d2_4", name:"MAPS Power Punch",                sets:4, rMin:15, rMax:20, anchor:null, bw:true},
+        {id:"pp3d2_5", name:"Deadlift Speed Pulls",            sets:4, rMin:5,  rMax:5,  anchor:"dead",  pct:0.70, trackingMode:"intensity", note:"Preferably with rubber bands"},
+      ]
+    },
+    perf_p4: {
+      name:"Phase IV", weeks:3, defDays:2,
+      type:"alternating",
+      progression:"standard",
+      day1:[
+        {id:"pp4d1_1", name:"Phase IV Barbell Squat (circuit)", sets:4, rMin:45, rMax:45, anchor:"squat", pct:0.82, trackingMode:"intensity", unit:"sec", note:"Circuit: Squat → Pull-Ups → Push-Ups × 4 rounds. Rest = transition time."},
+        {id:"pp4d1_2", name:"Pull-Ups",                         sets:4, rMin:30, rMax:30, anchor:null, bw:true, unit:"sec"},
+        {id:"pp4d1_3", name:"Push-Ups",                         sets:4, rMin:45, rMax:45, anchor:null, bw:true, unit:"sec"},
+        {id:"pp4d1_4", name:"MAPS Instinctive Intervals",       sets:5, rMin:30, rMax:30, anchor:null, bw:true, unit:"sec", note:"Treadmill: 30s sprint / rest as needed. 15 min total."},
+      ],
+      day2:[
+        {id:"pp4d2_1", name:"Double KB Swings",                 sets:4, rMin:20, rMax:20, anchor:null, bw:true, note:"4-cycle complex with next 3 exercises"},
+        {id:"pp4d2_2", name:"Front Loaded Squats",              sets:4, rMin:15, rMax:15, anchor:null, bw:true},
+        {id:"pp4d2_3", name:"Rotating Shoulder Press",          sets:4, rMin:10, rMax:10, anchor:null, bw:true},
+        {id:"pp4d2_4", name:"Push Ups with Depth",              sets:4, rMin:10, rMax:10, anchor:null, bw:true},
+      ]
+    }
+  }
+}; // end performance
+
+// ─── ACTIVE PROGRAM ACCESSOR ─────────────────────────────────────────────────
+function getActiveProg(){ return ALL_PROGRAMS[S.activeProgram] || ALL_PROGRAMS['anabolic']; }
+function getActivePhases(){ return getActiveProg().phases; }
+function getPhaseOrder(){ return getActiveProg().phaseOrder; }
+function getPhaseNames(){ return getActiveProg().phaseNames; }
+
+// Legacy alias — keeps all existing code working without changes
+function getPROG(){ return getActivePhases(); }
+// We'll still use PROG as a var that points to the active program's phases
+// but we need a way to refresh it. We use a Proxy or just call getPROG() everywhere.
+// Simpler: define PROG as a getter shim used by existing functions.
+const PROG_PROXY = new Proxy({}, {
+  get(_, key) { return getActivePhases()[key]; },
+  has(_, key) { return key in getActivePhases(); }
+});
+// Assign the proxy to PROG so all existing code still works
+let PROG = PROG_PROXY;
+
+const ANCHOR_NAMES = {squat:"Barbell Squat", dead:"Deadlift", bench:"Bench Press", ohp:"Overhead Press"};
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let S = {
+  // ── multi-program ──────────────────────────────
+  activeProgram: null,   // null = no program selected yet
+  programs: {},          // keyed by programId — holds per-program state
+  // ── global ────────────────────────────────────
+  wo:{setsDone:{},weights:{},reps:{},deletedSets:{},expandedId:null}
+};
+
+// Per-program state template
+function freshProgramState(progId){
+  const prog = ALL_PROGRAMS[progId];
+  const phases = prog.phaseOrder;
+  const sessCount = {}; phases.forEach(p=>sessCount[p]=0);
+  const cadence = {};   phases.forEach(p=>cadence[p]=(prog.phases[p]||{}).defDays||2);
+  return {
+    maxes:{squat:0,dead:0,bench:0,ohp:0},
+    cadence,
+    currentPhase: phases[0],
+    sessCount,
+    nextWeights:{},
+    sessionLog:[],
+    paused:false,
+    pausedDate:null,
+    pausedDaysTotal:0,
+    programStartDate:null,
+    pendingMaxes:{},
+  };
+}
+
+// Accessor — returns current program's state object
+function PS(){
+  const pid = S.activeProgram;
+  if(!pid) return null;
+  if(!S.programs[pid]) S.programs[pid] = freshProgramState(pid);
+  return S.programs[pid];
+}
+
+// Shim legacy direct references on S (e.g. S.maxes, S.currentPhase, etc.)
+// We reroute reads/writes through PS() by making them computed properties.
+// Simpler approach: define getters on S that delegate to PS()
+Object.defineProperties(S, {
+  maxes:            { get(){ return PS()?.maxes; }, set(v){ if(PS()) PS().maxes=v; }, configurable:true },
+  cadence:          { get(){ return PS()?.cadence; }, set(v){ if(PS()) PS().cadence=v; }, configurable:true },
+  currentPhase:     { get(){ return PS()?.currentPhase; }, set(v){ if(PS()) PS().currentPhase=v; }, configurable:true },
+  sessCount:        { get(){ return PS()?.sessCount; }, set(v){ if(PS()) PS().sessCount=v; }, configurable:true },
+  nextWeights:      { get(){ return PS()?.nextWeights; }, set(v){ if(PS()) PS().nextWeights=v; }, configurable:true },
+  sessionLog:       { get(){ return PS()?.sessionLog; }, set(v){ if(PS()) PS().sessionLog=v; }, configurable:true },
+  paused:           { get(){ return PS()?.paused; }, set(v){ if(PS()) PS().paused=v; }, configurable:true },
+  pausedDate:       { get(){ return PS()?.pausedDate; }, set(v){ if(PS()) PS().pausedDate=v; }, configurable:true },
+  pausedDaysTotal:  { get(){ return PS()?.pausedDaysTotal; }, set(v){ if(PS()) PS().pausedDaysTotal=v; }, configurable:true },
+  programStartDate: { get(){ return PS()?.programStartDate; }, set(v){ if(PS()) PS().programStartDate=v; }, configurable:true },
+  pendingMaxes:     { get(){ return PS()?.pendingMaxes||{}; }, set(v){ if(PS()) PS().pendingMaxes=v; }, configurable:true },
+});
+
+async function persist(){
+  // Always write localStorage instantly — never wait on Supabase
+  localStorage.setItem('pl4', JSON.stringify({
+    activeProgram: S.activeProgram,
+    programs: S.programs,
+    wo: S.wo
+  }));
+  // Write to Supabase asynchronously — non-blocking
+  if(!S.activeProgram || !PS()) return;
+  try {
+    const state = {
+      program_id: S.activeProgram,
+      current_phase: PS().currentPhase,
+      session_counts: PS().sessCount,
+      cadence: PS().cadence,
+      maxes: PS().maxes,
+      next_weights: PS().nextWeights,
+      session_log: PS().sessionLog,
+      paused: PS().paused,
+      paused_date: PS().pausedDate,
+      paused_days_total: PS().pausedDaysTotal,
+      program_start_date: PS().programStartDate,
+      pending_maxes: PS().pendingMaxes,
+      updated_at: new Date().toISOString()
+    };
+    const existing = await sbFetch(`/rest/v1/pl_user_state?program_id=eq.${S.activeProgram}&select=id`);
+    if(existing && existing.length > 0){
+      await sbFetch(`/rest/v1/pl_user_state?id=eq.${existing[0].id}`, 'PATCH', state);
+    } else {
+      await sbFetch('/rest/v1/pl_user_state', 'POST', state);
+    }
+  } catch(e){ console.warn('Supabase persist error:', e); }
+}
+
+async function restore(){
+  // Try Supabase first
+  try {
+    const rows = await sbFetch('/rest/v1/pl_user_state?select=*&order=updated_at.desc&limit=1');
+    if(rows && rows.length > 0){
+      const r = rows[0];
+      S.activeProgram = r.program_id;
+      if(!S.programs[r.program_id]) S.programs[r.program_id] = freshProgramState(r.program_id);
+      const ps = S.programs[r.program_id];
+      ps.currentPhase = r.current_phase;
+      ps.sessCount = r.session_counts || {};
+      ps.cadence = r.cadence || {};
+      ps.maxes = r.maxes || {};
+      ps.nextWeights = r.next_weights || {};
+      ps.sessionLog = r.session_log || [];
+      ps.paused = r.paused || false;
+      ps.pausedDate = r.paused_date || null;
+      ps.pausedDaysTotal = r.paused_days_total || 0;
+      ps.programStartDate = r.program_start_date || null;
+      ps.pendingMaxes = r.pending_maxes || {};
+      return;
+    }
+  } catch(e){ console.warn('Supabase restore failed, falling back to localStorage:', e); }
+  // Fallback: localStorage
+  try {
+    const d = localStorage.getItem('pl4');
+    if(d){
+      const parsed = JSON.parse(d);
+      S.activeProgram = parsed.activeProgram || null;
+      S.programs = parsed.programs || {};
+      S.wo = parsed.wo || {setsDone:{},weights:{},reps:{},deletedSets:{},expandedId:null};
+      return;
+    }
+    // Migrate old pl3 data → anabolic program slot
+    const old = localStorage.getItem('pl3');
+    if(old){
+      const op = JSON.parse(old);
+      if(op.maxes && op.maxes.squat > 0){
+        S.activeProgram = 'anabolic';
+        S.programs['anabolic'] = {
+          maxes: op.maxes || {squat:0,dead:0,bench:0,ohp:0},
+          cadence: op.cadence || {prephase:3,phase1:2,phase2:2,phase3:2},
+          currentPhase: op.currentPhase || 'prephase',
+          sessCount: op.sessCount || {prephase:0,phase1:0,phase2:0,phase3:0},
+          nextWeights: op.nextWeights || {},
+          sessionLog: op.sessionLog || [],
+          paused: op.paused || false,
+          pausedDate: op.pausedDate || null,
+          pausedDaysTotal: op.pausedDaysTotal || 0,
+          programStartDate: op.programStartDate || null,
+          pendingMaxes: op.pendingMaxes || {},
+        };
+        S.wo = op.wo || {setsDone:{},weights:{},reps:{},deletedSets:{},expandedId:null};
+      }
+    }
+  } catch(e){ console.warn('localStorage restore error:', e); }
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function r5(n){ return Math.round(n/5)*5; }
+function getEx(id){ return currentWO().find(e=>e.id===id); }
+
+function suggestWt(ex){
+  if(ex.bw) return null;
+  if(!ex.anchor) return null;
+  const stored=S.nextWeights[ex.id];
+  if(stored!=null) return stored;
+  if(ex.addedWeight) return 0; // default = strict bodyweight
+  if(!ex.pct) return null;
+  return r5((S.maxes[ex.anchor]||135)*ex.pct);
+}
+function suggestWtSS(subEx){
+  if(subEx.bw) return null;
+  if(!subEx.anchor) return null;
+  const stored=S.nextWeights[subEx.id];
+  if(stored!=null) return stored;
+  if(subEx.addedWeight) return 0;
+  if(!subEx.pct) return null;
+  return r5((S.maxes[subEx.anchor]||135)*subEx.pct);
+}
+
+function totalSess(phase){ return (S.cadence[phase]||PROG[phase].defDays)*PROG[phase].weeks; }
+function doneSess(phase){ return S.sessCount[phase]||0; }
+function currentWO(){
+  if(!S.currentPhase) return [];
+  const pd=PROG[S.currentPhase];
+  if(!pd) return [];
+  const n=doneSess(S.currentPhase);
+  if(pd.type==="single") return pd.workout||[];
+  if(pd.type==="triple"){
+    // cycle through workout1, workout2, workout3
+    const wk = n%3;
+    return pd['workout'+(wk+1)] || pd.workout1 || [];
+  }
+  // alternating: even sessions = day1, odd = day2
+  return n%2===0?pd.day1:pd.day2;
+}
+
+function currentDayLabel(){
+  if(!S.currentPhase) return "Workout";
+  const pd=PROG[S.currentPhase];
+  if(!pd) return "Workout";
+  const n=doneSess(S.currentPhase);
+  if(pd.type==="single") return "Foundational Workout";
+  if(pd.type==="triple"){
+    return `Workout ${(n%3)+1}`;
+  }
+  return n%2===0?"Day 1 — Foundational Workout":"Day 2 — Foundational Workout";
+}
+
+// For variable-set exercises, active sets = total sets minus deleted
+function activeSets(ex){
+  if(ex.superset) return ex.sets; // supersets are always fixed
+  if(!ex.setsMin) return ex.sets;
+  const deleted=S.wo.deletedSets[ex.id]||0;
+  return Math.max(ex.setsMin, ex.sets-deleted);
+}
+
+// Progression check for an exercise
+function hitProgression(ex){
+  if(ex.superset){
+    return hitProgressionSub(ex, ex.exA) && hitProgressionSub(ex, ex.exB);
+  }
+  if(ex.bw||!ex.anchor) return false;
+  const pd=PROG[S.currentPhase];
+  const active=activeSets(ex);
+  const dmap=S.wo.setsDone[ex.id]||{};
+  for(let s=0;s<active;s++){
+    if(!dmap[s]) return false;
+    const k=ex.id+"_"+s;
+    const r=S.wo.reps[k]!==undefined?S.wo.reps[k]:ex.rMin;
+    if(r<ex.rMax) return false;
+  }
+  if(pd.progression==="variable" && ex.setsMin){
+    if(active<ex.sets) return false;
+  }
+  return true;
+}
+function hitProgressionSub(ssEx, subEx){
+  if(subEx.bw||!subEx.anchor) return true; // bw sub-exercise doesn't gate progression
+  for(let s=0;s<ssEx.sets;s++){
+    const k=subEx.id+"_"+s;
+    const r=S.wo.reps[k]!==undefined?S.wo.reps[k]:subEx.rMin;
+    if(r<subEx.rMax) return false;
+  }
+  return true;
+}
+
+// Epley: weight*(1 + reps/30), reps=1 → weight
+function epley(w,r){ if(!w||r<=0) return null; return r===1?w:Math.round(w*(1+r/30)); }
+
+function bestOrm(anchor){
+  let best=null;
+  currentWO().filter(ex=>ex.anchor===anchor).forEach(ex=>{
+    for(let s=0;s<ex.sets;s++){
+      const k=ex.id+'_'+s;
+      const w=S.wo.weights[k], r=S.wo.reps[k];
+      if(w&&r){ const e=epley(w,r); if(e&&(!best||e>best)) best=e; }
+    }
+  });
+  return best;
+}
+
+// ═══════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════
+let obStep = 0;
+let obSelectedProgram = null;
+
+function selectProgram(progId){
+  obSelectedProgram = progId;
+  const prog = ALL_PROGRAMS[progId];
+  // Ensure fresh state exists for this program
+  if(!S.programs[progId]) S.programs[progId] = freshProgramState(progId);
+  // Update Step 1 labels
+  document.getElementById('obs1-eyebrow').textContent = `${prog.name} · Step 1 of 2`;
+  document.getElementById('obs2-eyebrow').textContent = `${prog.name} · Step 2 of 2`;
+  // Show intensity note only for Performance
+  document.getElementById('perf-intensity-note').style.display = progId === 'performance' ? 'block' : 'none';
+  // Build cadence blocks dynamically
+  buildCadenceBlocks(progId);
+  goOb(1);
+}
+
+function buildCadenceBlocks(progId){
+  const prog = ALL_PROGRAMS[progId];
+  const ps = S.programs[progId];
+  const container = document.getElementById('cadence-blocks');
+  container.innerHTML = '';
+  prog.phaseOrder.forEach(pk => {
+    const pd = prog.phases[pk];
+    const defDays = pd.defDays || 2;
+    const cur = (ps.cadence && ps.cadence[pk]) || defDays;
+    // Options: defDays and defDays+1 (if not triple type)
+    const opts = pd.type === 'triple' ? [3] : [2, 3];
+    const block = document.createElement('div');
+    block.className = 'cadence-block';
+    block.innerHTML = `
+      <div class="input-label">${pd.name} <span style="color:var(--text-muted);font-weight:400;text-transform:none;font-family:'DM Sans';letter-spacing:0;font-size:12px">· ${pd.weeks} week${pd.weeks>1?'s':''}</span></div>
+      <div class="cadence-row" id="cad-${pk}">
+        ${opts.map(v=>`<button class="cadence-btn${cur===v?' sel':''}" data-v="${v}" onclick="setCad('${pk}',${v},this)">${v}× / week${v===3&&opts.length>1?' <span style="font-size:11px;opacity:0.65">adv</span>':''}</button>`).join('')}
+      </div>
+      ${opts.length > 1 ? `<div class="cadence-note">Default ${defDays}× &nbsp;·&nbsp; <em>Advanced 3×</em></div>` : `<div class="cadence-note">Fixed at 3× / week (3 rotating workouts)</div>`}`;
+    container.appendChild(block);
+  });
+}
+
+function setCad(phase, val, btn){
+  if(!obSelectedProgram) return;
+  if(!S.programs[obSelectedProgram]) S.programs[obSelectedProgram] = freshProgramState(obSelectedProgram);
+  S.programs[obSelectedProgram].cadence[phase] = val;
+  document.getElementById('cad-'+phase).querySelectorAll('.cadence-btn')
+    .forEach(b => b.classList.toggle('sel', b.dataset.v == val));
+}
+
+async function obNext(){
+  if(obStep === 1){
+    const fields = [
+      {id:'mx-squat', key:'squat', row:'ir-squat'},
+      {id:'mx-dead',  key:'dead',  row:'ir-dead'},
+      {id:'mx-bench', key:'bench', row:'ir-bench'},
+      {id:'mx-ohp',   key:'ohp',   row:'ir-ohp'},
+    ];
+    let ok = true;
+    fields.forEach(f => {
+      const v = parseFloat(document.getElementById(f.id).value);
+      document.getElementById(f.row).classList.toggle('err', !v);
+      if(!v) ok = false;
+      else S.programs[obSelectedProgram].maxes[f.key] = v;
+    });
+    if(!ok) return;
+    goOb(2);
+    return;
+  }
+  // Step 2 → done
+  S.activeProgram = obSelectedProgram;
+  await persist();
+  initWO();
+  PS().programStartDate = new Date().toISOString();
+  await persist();
+  goScreen('screen-home');
+}
+
+function goOb(n){
+  document.getElementById('obs-'+obStep).classList.remove('active');
+  document.getElementById('obs-'+n).classList.add('active');
+  window.scrollTo(0,0);
+  obStep = n;
+}
+
+// ═══════════════════════════════════════
+// WORKOUT
+// ═══════════════════════════════════════
+function initWO(){
+  if(!S.activeProgram || !PS()) return;
+  // Auto-advance phase if current phase sessions exhausted
+  const phaseOrder=getPhaseOrder();
+  const phaseIdx=phaseOrder.indexOf(S.currentPhase);
+  if(phaseIdx>=0 && doneSess(S.currentPhase)>=totalSess(S.currentPhase)){
+    const next=phaseOrder[phaseIdx+1];
+    if(next && PROG[next]){
+      S.currentPhase=next;
+      if(!S.sessCount[next]) S.sessCount[next]=0;
+      persist();
+    }
+  }
+  const phase=S.currentPhase, pd=PROG[phase];
+  const total=totalSess(phase), done=doneSess(phase);
+  const pct=total>0?Math.round((done/total)*100):0;
+  document.getElementById('phase-badge').textContent=pd.name;
+  document.getElementById('session-lbl').textContent=`Session ${done+1} of ${total}`;
+  document.getElementById('workout-title').textContent=currentDayLabel();
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-left').textContent=`${done} of ${total} done`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  S.wo={setsDone:{},weights:{},reps:{},deletedSets:{},expandedId:null};
+  renderWO();
+}
+
+function repsLabel(ex){
+  const same = ex.rMin === ex.rMax;
+  if(ex.unit==='sec') return same ? ex.rMin+'s' : ex.rMin+'–'+ex.rMax+'s';
+  return same ? ex.rMin+' reps' : ex.rMin+'–'+ex.rMax+' reps';
+}
+
+function renderWO(){
+  const list=document.getElementById('ex-list');
+  list.innerHTML='';
+  currentWO().forEach(ex=>{
+    if(ex.superset){ renderSSCard(ex); return; }
+    const active=activeSets(ex);
+    const isDone=isExDone(ex.id);
+    const isActive=S.wo.expandedId===ex.id;
+    const wt=suggestWt(ex);
+    const dmap=S.wo.setsDone[ex.id]||{};
+    const dcount=Object.keys(dmap).length;
+    const isVar=!!ex.setsMin;
+
+    // Determine tracking context once — used in both set rows and card header
+    const isIntensityEx = !ex.bw && (ex.trackingMode==='intensity' || getActiveProg().trackingMode==='intensity') && !!ex.pct;
+    const isAddedWeight = !!ex.addedWeight; // pull-ups, dips: 0=BW, +plate, -assist
+
+    let sHTML='';
+    for(let s=0;s<active;s++){
+      const sd=!!dmap[s], k=ex.id+'_'+s;
+      const wv=S.wo.weights[k]!==undefined?S.wo.weights[k]:(wt!=null?wt:'');
+      const rv=S.wo.reps[k]!==undefined?S.wo.reps[k]:ex.rMin;
+      const canDel=isVar&&s===active-1&&active>ex.setsMin;
+      const needsNeg = isAddedWeight; // allow negative input on keyboard
+      const inputCell = ex.bw
+        // Pure bodyweight — no weight field, just show rep target
+        ? `<div style="grid-column:span 2;text-align:center;font-size:12px;color:var(--text-muted)">${repsLabel(ex)} · BW</div>`
+        : isIntensityEx
+          // Intensity: show lbs calculated from 1RM, with % hint below
+          ? `<input class="wt-field" type="number" inputmode="decimal" value="${wv}" placeholder="${wt!=null?wt:''}" onclick="event.stopPropagation()" oninput="onWt('${ex.id}',${s},this.value)">
+             <div style="display:flex;flex-direction:column;gap:0">
+               <div class="reps-stepper">
+                 <button class="rep-btn" onclick="event.stopPropagation();adjR('${ex.id}',${s},-1)">−</button>
+                 <div class="rep-val" id="rv-${ex.id}-${s}">${rv}</div>
+                 <button class="rep-btn" onclick="event.stopPropagation();adjR('${ex.id}',${s},1)">+</button>
+               </div>
+               <div style="font-size:9px;text-align:center;color:var(--text-muted);letter-spacing:0.05em;margin-top:2px">${Math.round(ex.pct*100)}% 1RM</div>
+             </div>`
+          // Standard weight (including addedWeight which allows negatives)
+          : `<input class="wt-field" type="number" ${needsNeg?'':'inputmode="decimal"'} value="${wv}" placeholder="${wt!=null?wt:0}" onclick="event.stopPropagation()" oninput="onWt('${ex.id}',${s},this.value)"${needsNeg?' min="-999"':''}>
+             <div class="reps-stepper">
+               <button class="rep-btn" onclick="event.stopPropagation();adjR('${ex.id}',${s},-1)">−</button>
+               <div class="rep-val" id="rv-${ex.id}-${s}">${rv}</div>
+               <button class="rep-btn" onclick="event.stopPropagation();adjR('${ex.id}',${s},1)">+</button>
+             </div>`;
+      sHTML+=`
+        <div class="set-row${sd?' sdone':''}" id="sr-${ex.id}-${s}">
+          <div class="set-num">${s+1}</div>
+          ${inputCell}
+          ${canDel
+            ?`<div class="set-del" onclick="event.stopPropagation();delSet('${ex.id}')">✕</div>`
+            :`<div class="set-chk${sd?' sdone':''}" id="sc-${ex.id}-${s}" onclick="toggleSet('${ex.id}',${s})">${sd?'✓':''}</div>`}
+        </div>`;
+    }
+    const addBtn=isVar&&active<ex.sets
+      ?`<button class="add-set-btn" onclick="addSet('${ex.id}')">+ Add Set <span style="opacity:0.5">(${active} of ${ex.sets})</span></button>`
+      :'';
+
+    const card=document.createElement('div');
+    card.className=`ex-card${isDone?' done':''}${isActive?' active-ex':''}`;
+    card.id='ec-'+ex.id;
+
+    const setsDisplay=isVar?`${ex.setsMin}–${ex.sets} sets`:`${ex.sets} set${ex.sets>1?'s':''}`;
+    const warmupTag=ex.warmup?` <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--yellow)">WARMUP</span>`:'';
+    const metaStr=`${setsDisplay} · <span>${repsLabel(ex)}</span>${warmupTag}${dcount>0&&!isDone?` · <span style="color:var(--accent)">${dcount}/${active}</span>`:''}`;
+    // Card header: what to show in the weight bubble
+    const wtDisplay = ex.bw ? 'BW'
+      : isAddedWeight ? (wt===0?'BW':(wt>0?'+'+wt:String(wt)))
+      : isIntensityEx ? Math.round(ex.pct*100)+'%'
+      : wt!=null ? String(wt) : '—';
+    const wtUnit = ex.bw ? ''
+      : isAddedWeight ? (wt===0?'bodyweight':'lb')
+      : isIntensityEx ? (wt!=null?wt+' lb':'1RM')
+      : 'LB';
+
+    card.innerHTML=`
+      <div class="ex-hdr" onclick="toggleExp('${ex.id}')">
+        <div class="ex-circle"><span class="ex-tick">✓</span></div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}${ex.db?' <span style="font-size:10px;color:var(--text-muted)">(DB)</span>':''}${ex.warmup?' <span style="font-size:10px;color:var(--yellow)">· warmup</span>':''}</div>
+          <div class="ex-meta" id="em-${ex.id}">${metaStr}</div>
+        </div>
+        <div class="ex-wt-display">
+          <div class="ex-wt-num">${wtDisplay}</div>
+          <div class="ex-wt-unit">${wtUnit}</div>
+        </div>
+      </div>
+      <div class="sets-panel${isActive?' open':''}" id="sp-${ex.id}">
+        <div class="sets-inner">
+          ${ex.note?`<div style="font-size:11px;color:var(--yellow);margin-bottom:8px;padding:6px 8px;background:rgba(255,229,102,0.07);border-radius:6px;border:1px solid rgba(255,229,102,0.15)">ℹ ${ex.note}</div>`:''}
+          <div class="sets-col-hdr"><div>#</div><div>Weight</div><div>Reps</div><div></div></div>
+          ${sHTML}
+          ${addBtn}
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+  updFinish();
+}
+
+function renderSSCard(ex){
+  const list=document.getElementById('ex-list');
+  const isDone=isExDone(ex.id);
+  const isActive=S.wo.expandedId===ex.id;
+  const dmap=S.wo.setsDone[ex.id]||{};
+  const dcount=Object.keys(dmap).length;
+  const wtA=suggestWtSS(ex.exA), wtB=suggestWtSS(ex.exB);
+
+  let sHTML='';
+  for(let s=0;s<ex.sets;s++){
+    const sd=!!dmap[s];
+    const kA=ex.exA.id+'_'+s, kB=ex.exB.id+'_'+s;
+    const wvA=S.wo.weights[kA]!==undefined?S.wo.weights[kA]:(wtA!=null?wtA:'');
+    const wvB=S.wo.weights[kB]!==undefined?S.wo.weights[kB]:(wtB!=null?wtB:'');
+    const rvA=S.wo.reps[kA]!==undefined?S.wo.reps[kA]:ex.exA.rMin;
+    const rvB=S.wo.reps[kB]!==undefined?S.wo.reps[kB]:ex.exB.rMin;
+
+    sHTML+=`
+      <div class="ss-set-row${sd?' sdone':''}" id="sr-${ex.id}-${s}">
+        <div class="set-num">${s+1}</div>
+        <div class="ss-field-group">
+          <div class="ss-ex-label">A</div>
+          ${ex.exA.bw
+            ?`<div style="font-size:12px;color:var(--text-muted)">BW · ${ex.exA.rMin}–${ex.exA.rMax}</div>`
+            :`<input class="wt-field" type="number" inputmode="decimal" value="${wvA}" placeholder="${wtA||''}" style="font-size:14px;padding:6px 4px" onclick="event.stopPropagation()" oninput="onWt('${ex.exA.id}',${s},this.value)">
+              <div class="reps-stepper" style="height:32px">
+                <button class="rep-btn" style="width:24px" onclick="event.stopPropagation();adjR('${ex.exA.id}',${s},-1)">−</button>
+                <div class="rep-val" id="rv-${ex.exA.id}-${s}" style="font-size:14px">${rvA}</div>
+                <button class="rep-btn" style="width:24px" onclick="event.stopPropagation();adjR('${ex.exA.id}',${s},1)">+</button>
+              </div>`}
+        </div>
+        <div class="ss-field-group">
+          <div class="ss-ex-label">B</div>
+          ${ex.exB.bw
+            ?`<div style="font-size:12px;color:var(--text-muted)">BW · ${ex.exB.rMin}–${ex.exB.rMax}</div>`
+            :`<input class="wt-field" type="number" inputmode="decimal" value="${wvB}" placeholder="${wtB||''}" style="font-size:14px;padding:6px 4px" onclick="event.stopPropagation()" oninput="onWt('${ex.exB.id}',${s},this.value)">
+              <div class="reps-stepper" style="height:32px">
+                <button class="rep-btn" style="width:24px" onclick="event.stopPropagation();adjR('${ex.exB.id}',${s},-1)">−</button>
+                <div class="rep-val" id="rv-${ex.exB.id}-${s}" style="font-size:14px">${rvB}</div>
+                <button class="rep-btn" style="width:24px" onclick="event.stopPropagation();adjR('${ex.exB.id}',${s},1)">+</button>
+              </div>`}
+        </div>
+        <div class="set-chk${sd?' sdone':''}" id="sc-${ex.id}-${s}" onclick="toggleSet('${ex.id}',${s})">${sd?'✓':''}</div>
+      </div>`;
+  }
+
+  const card=document.createElement('div');
+  card.className=`ss-card${isDone?' done':''}${isActive?' active-ex':''}`;
+  card.id='ec-'+ex.id;
+  card.innerHTML=`
+    <div class="ss-hdr" onclick="toggleExp('${ex.id}')">
+      <div class="ss-done-circle"><span class="ss-tick">✓</span></div>
+      <div class="ss-names">
+        <div class="ss-name-a">${ex.exA.name}${ex.exA.db?' <span style="font-size:10px;color:var(--text-muted)">(DB)</span>':''}</div>
+        <div class="ss-name-b">${ex.exB.name}${ex.exB.db?' <span style="font-size:10px;color:var(--text-muted)">(DB)</span>':''}</div>
+        <div class="ss-meta">${ex.sets} sets · ${ex.exA.rMin}–${ex.exA.rMax} reps${dcount>0&&!isDone?` · <span style="color:var(--yellow)">${dcount}/${ex.sets} done</span>`:''}</div>
+      </div>
+      <div class="ss-badge">Superset</div>
+    </div>
+    <div class="sets-panel${isActive?' open':''}" id="sp-${ex.id}">
+      <div class="sets-inner">
+        <div class="ss-col-hdr">
+          <div>#</div>
+          <div style="padding-left:4px">${ex.exA.name.split(' ').slice(-1)[0]}</div>
+          <div style="padding-left:4px">${ex.exB.name.split(' ').slice(-1)[0]}</div>
+          <div></div>
+        </div>
+        ${sHTML}
+      </div>
+    </div>`;
+  list.appendChild(card);
+}
+
+function delSet(exId){
+  if(!S.wo.deletedSets[exId]) S.wo.deletedSets[exId]=0;
+  const ex=getEx(exId);
+  const active=activeSets(ex);
+  if(active<=ex.setsMin) return;
+  const removedIdx=active-1;
+  if(S.wo.setsDone[exId]) delete S.wo.setsDone[exId][removedIdx];
+  delete S.wo.weights[exId+'_'+removedIdx];
+  delete S.wo.reps[exId+'_'+removedIdx];
+  S.wo.deletedSets[exId]++;
+  renderWO();
+}
+
+function addSet(exId){
+  if(!S.wo.deletedSets[exId]) S.wo.deletedSets[exId]=0;
+  const ex=getEx(exId);
+  const active=activeSets(ex);
+  if(active>=ex.sets) return;
+  S.wo.deletedSets[exId]=Math.max(0,S.wo.deletedSets[exId]-1);
+  renderWO();
+}
+
+function toggleExp(id){
+  const prev=S.wo.expandedId;
+  if(prev&&prev!==id){
+    document.getElementById('sp-'+prev)?.classList.remove('open');
+    document.getElementById('ec-'+prev)?.classList.remove('active-ex');
+  }
+  const opening=S.wo.expandedId!==id;
+  document.getElementById('sp-'+id).classList.toggle('open',opening);
+  document.getElementById('ec-'+id).classList.toggle('active-ex',opening);
+  S.wo.expandedId=opening?id:null;
+}
+
+function onWt(id,s,v){
+  const parsed = parseFloat(v);
+  // Allow negatives (assisted exercises) and zero; only skip NaN on empty string
+  if(v===''||v==='-') return; // still typing
+  S.wo.weights[id+'_'+s] = isNaN(parsed) ? 0 : parsed;
+}
+
+function adjR(id,s,d){
+  const k=id+'_'+s, ex=getEx(id);
+  const cur=S.wo.reps[k]!==undefined?S.wo.reps[k]:ex.rMin;
+  const next=Math.max(1,cur+d);
+  S.wo.reps[k]=next;
+  const el=document.getElementById('rv-'+id+'-'+s);
+  if(el) el.textContent=next;
+}
+
+function toggleSet(id,s){
+  if(!S.wo.setsDone[id]) S.wo.setsDone[id]={};
+  const map=S.wo.setsDone[id];
+  if(map[s]) delete map[s]; else map[s]=true;
+  const sd=!!map[s];
+  document.getElementById(`sr-${id}-${s}`).classList.toggle('sdone',sd);
+  const chk=document.getElementById(`sc-${id}-${s}`);
+  chk.classList.toggle('sdone',sd);
+  chk.textContent=sd?'✓':'';
+  const ex=getEx(id), isDone=isExDone(id);
+  document.getElementById('ec-'+id).classList.toggle('done',isDone);
+  const dc=Object.keys(map).length;
+  document.getElementById('em-'+id).innerHTML=`${ex.sets} sets · <span>${ex.unit==='sec'?ex.rMin+'–'+ex.rMax+'s':ex.rMin+'–'+ex.rMax+' reps'}</span>${dc>0&&!isDone?` · <span style="color:var(--accent)">${dc}/${ex.sets}</span>`:''}`;
+  updFinish();
+}
+
+function isExDone(id){ const ex=getEx(id); if(!ex) return false; return Object.keys(S.wo.setsDone[id]||{}).length>=activeSets(ex); }
+function updFinish(){ document.getElementById('finish-btn').disabled=!currentWO().every(ex=>isExDone(ex.id)); }
+
+// ═══════════════════════════════════════
+// FINISH + SUMMARY
+// ═══════════════════════════════════════
+async function finishWorkout(){
+  const phase=S.currentPhase;
+  currentWO().forEach(ex=>{
+    if(ex.superset){
+      const prog=hitProgression(ex);
+      [ex.exA, ex.exB].forEach(sub=>{
+        if(sub.bw||!sub.anchor) return;
+        const cur=suggestWtSS(sub);
+        S.nextWeights[sub.id]=prog?(cur+5):cur;
+      });
+      return;
+    }
+    if(ex.bw||!ex.anchor) return;
+    const cur=suggestWt(ex);
+    S.nextWeights[ex.id]=hitProgression(ex)?(cur+5):cur;
+  });
+  S.sessCount[phase]=(S.sessCount[phase]||0)+1;
+  if(!S.sessionLog) S.sessionLog=[];
+  S.sessionLog.push(new Date().toISOString());
+
+  // Detect new maxes — store as pending, don't apply yet
+  S.pendingMaxes = {};
+  ['squat','bench','dead','ohp'].forEach(anchor=>{
+    const est=bestOrm(anchor);
+    if(est && est > (S.maxes[anchor]||0)) S.pendingMaxes[anchor]=est;
+  });
+
+  await persist();
+  buildSummary();
+  goScreen('screen-summary');
+}
+
+function buildSummary(){
+  const prog=getActiveProg();
+  const phase=S.currentPhase, pd=PROG[phase];
+  const done=doneSess(phase), total=totalSess(phase);
+  document.getElementById('sum-title').innerHTML=`${pd.name}<br>Session ${done}`;
+  document.getElementById('sum-sub').textContent=done<total
+    ?`${total-done} session${total-done===1?'':'s'} left in this phase.`
+    :`${pd.name} complete!`;
+  const phaseOrder2=getPhaseOrder();
+  const phaseNames=getPhaseNames();
+  const nextPhaseKey=phaseOrder2[phaseOrder2.indexOf(phase)+1];
+  const nextPhaseLabel=nextPhaseKey?`Next up: ${phaseNames[nextPhaseKey]}`:"Program Complete 🎉";
+  document.getElementById('next-up-val').textContent=done<total
+    ?`${pd.name} · Session ${done+1} of ${total}`
+    :nextPhaseLabel;
+
+  // Dynamic section labels based on program type
+  const isIntensityProg = getActiveProg().trackingMode === 'intensity';
+  const wtsLabel = document.getElementById('sum-wts-label');
+  if(wtsLabel) wtsLabel.textContent = isIntensityProg ? 'Target loads — next session' : 'Weights for next session';
+
+  // 1RM section — only show anchors that appear in this workout
+  const ormRows=document.getElementById('orm-rows');
+  ormRows.innerHTML='';
+  const pending = S.pendingMaxes || {};
+  const hasUpdates = Object.keys(pending).length > 0;
+  // Collect anchors actually used in current workout (exclude bw, include addedWeight)
+  const usedAnchors = new Set();
+  currentWO().forEach(ex=>{
+    if(ex.superset){ [ex.exA,ex.exB].forEach(s=>{ if(s.anchor&&!s.bw) usedAnchors.add(s.anchor); }); return; }
+    if(ex.anchor&&!ex.bw) usedAnchors.add(ex.anchor);
+  });
+  const anchorsToShow = ['squat','bench','dead','ohp'].filter(a=>usedAnchors.has(a));
+  if(anchorsToShow.length===0){
+    ormRows.innerHTML='<div style="font-size:13px;color:var(--text-muted);padding:10px 0">No weighted exercises in this session.</div>';
+  }
+  anchorsToShow.forEach(anchor=>{
+    const est=bestOrm(anchor), prev=S.maxes[anchor]||0;
+    const isPending = !!pending[anchor];
+    const display = est || prev;
+    const row=document.createElement('div');
+    row.className='orm-row';
+    row.innerHTML=`
+      <div class="orm-lift">
+        <div class="orm-lift-name">${ANCHOR_NAMES[anchor]}</div>
+        <div class="orm-lift-prev">Previous: ${prev?prev+' lb':'not set'}</div>
+      </div>
+      <div class="orm-right">
+        <div class="orm-new ${isPending?'up':'flat'}">${display?display+' lb':'—'}</div>
+        <div class="orm-delta ${isPending?'up':''}">${isPending?'↑ +' + (pending[anchor]-prev)+' lb':est?'no change':'—'}</div>
+      </div>`;
+    ormRows.appendChild(row);
+  });
+
+  // Confirm banner — shown when any new maxes detected
+  const existingBanner = document.getElementById('max-confirm-banner');
+  if(existingBanner) existingBanner.remove();
+
+  if(hasUpdates){
+    const lifts = Object.keys(pending).map(a=>`${ANCHOR_NAMES[a]}: ${pending[a]} lb`).join(' · ');
+    const banner = document.createElement('div');
+    banner.id = 'max-confirm-banner';
+    banner.style.cssText = 'margin-top:12px;background:rgba(0,255,157,0.06);border:1px solid rgba(0,255,157,0.2);border-radius:12px;overflow:hidden';
+    banner.innerHTML = `
+      <div style="padding:12px 14px;border-bottom:1px solid rgba(0,255,157,0.12)">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:4px">New PR detected</div>
+        <div style="font-size:13px;color:var(--text-dim);line-height:1.4">${lifts}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr">
+        <button onclick="dismissMaxUpdate()" style="padding:13px;background:none;border:none;border-right:1px solid rgba(0,255,157,0.12);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);cursor:pointer">Keep old</button>
+        <button onclick="confirmMaxUpdate()" style="padding:13px;background:none;border:none;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--green);cursor:pointer">Update max ↑</button>
+      </div>`;
+    document.getElementById('orm-rows').after(banner);
+  }
+
+  // Next session weights — skip pure BW, handle addedWeight and intensity
+  const wCard=document.getElementById('wts-card');
+  wCard.innerHTML='';
+  let wCardHasRows = false;
+  currentWO().forEach(ex=>{
+    if(ex.superset){
+      [ex.exA, ex.exB].forEach(sub=>{
+        if(sub.bw||!sub.anchor) return;
+        const nextW=S.nextWeights[sub.id]!=null?S.nextWeights[sub.id]:suggestWtSS(sub);
+        const prevW=suggestWtSS(sub);
+        const inc=nextW>prevW;
+        const isIntEx = sub.trackingMode==='intensity'||isIntensityProg;
+        const wtLabel = isIntEx ? `${nextW} lb (${Math.round((sub.pct||0)*100)}% 1RM)` : `${nextW} lb`;
+        const row=document.createElement('div');
+        row.className='wt-row'; wCardHasRows=true;
+        row.innerHTML=`
+          <div class="wt-ex">
+            <div class="wt-ex-name">${sub.name} <span style="font-size:10px;color:var(--yellow);font-weight:700">SS</span></div>
+            <div class="wt-ex-detail">${ex.sets} sets · ${repsLabel(sub)}</div>
+          </div>
+          <div class="wt-next">
+            <div class="wt-next-num">${wtLabel}</div>
+            ${inc?`<div class="wt-badge">+5 lb</div>`:''}
+          </div>`;
+        wCard.appendChild(row);
+      });
+      return;
+    }
+    if(ex.bw||!ex.anchor) return;
+    const nextW=S.nextWeights[ex.id]!=null?S.nextWeights[ex.id]:suggestWt(ex);
+    const prevW=suggestWt(ex);
+    const inc=nextW>prevW;
+    const isIntEx = ex.trackingMode==='intensity'||isIntensityProg;
+    const isAW = !!ex.addedWeight;
+    // Display: intensity shows lbs + %, addedWeight shows signed lbs, standard shows lbs
+    const wtLabel = isIntEx
+      ? `${nextW} lb  ·  ${Math.round((ex.pct||0)*100)}% 1RM`
+      : isAW
+        ? (nextW===0?'Bodyweight':nextW>0?`+${nextW} lb`:`${nextW} lb`)
+        : `${nextW} lb`;
+    const row=document.createElement('div');
+    row.className='wt-row'; wCardHasRows=true;
+    row.innerHTML=`
+      <div class="wt-ex">
+        <div class="wt-ex-name">${ex.name}</div>
+        <div class="wt-ex-detail">${ex.sets} sets · ${repsLabel(ex)}</div>
+      </div>
+      <div class="wt-next">
+        <div class="wt-next-num">${wtLabel}</div>
+        ${inc?`<div class="wt-badge">+5 lb</div>`:''}
+      </div>`;
+    wCard.appendChild(row);
+  });
+  if(!wCardHasRows){
+    wCard.innerHTML='<div style="padding:14px 16px;font-size:13px;color:var(--text-muted)">No weighted exercises to track next session.</div>';
+  }
+}
+
+async function confirmMaxUpdate(){
+  const pending = S.pendingMaxes || {};
+  Object.keys(pending).forEach(anchor => { S.maxes[anchor] = pending[anchor]; });
+  S.pendingMaxes = {};
+  await persist();
+  // Update the banner to confirmed state
+  const banner = document.getElementById('max-confirm-banner');
+  if(banner){
+    banner.style.background = 'rgba(0,255,157,0.04)';
+    banner.innerHTML = `<div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--green)">✓ Maxes updated</div>
+      <div style="font-size:12px;color:var(--text-muted)">Weight suggestions will reflect new maxes next session.</div>
+    </div>`;
+  }
+}
+
+async function dismissMaxUpdate(){
+  S.pendingMaxes = {};
+  await persist();
+  const banner = document.getElementById('max-confirm-banner');
+  if(banner) banner.remove();
+}
+
+function startNext(){ goScreen('screen-home'); }
+
+// ═══════════════════════════════════════
+// PAUSE / RESET / MODAL
+// ═══════════════════════════════════════
+async function togglePause(){
+  if(S.paused){
+    // Resuming — accumulate how many days we were paused
+    if(S.pausedDate){
+      const pausedMs = Date.now() - new Date(S.pausedDate).getTime();
+      const pausedDays = pausedMs / 86400000; // fractional days
+      S.pausedDaysTotal = (S.pausedDaysTotal || 0) + pausedDays;
+    }
+    S.paused = false;
+    S.pausedDate = null;
+  } else {
+    // Pausing
+    S.paused = true;
+    S.pausedDate = new Date().toISOString();
+  }
+  await persist();
+  updatePauseUI();
+}
+
+function updatePauseUI(){
+  const banner = document.getElementById('pause-banner');
+  const btn = document.getElementById('pause-btn');
+  if(!banner || !btn) return;
+  if(S.paused){
+    banner.style.display = 'flex';
+    btn.textContent = '▶';
+    btn.title = 'Resume program';
+    const sub = document.getElementById('pause-banner-sub');
+    if(sub && S.pausedDate){
+      const days = Math.floor((Date.now() - new Date(S.pausedDate).getTime()) / 86400000);
+      sub.textContent = days === 0 ? 'Paused today — end dates frozen.'
+        : days === 1 ? 'Paused 1 day — end dates will adjust on resume.'
+        : `Paused ${days} days — end dates will adjust on resume.`;
+    }
+  } else {
+    banner.style.display = 'none';
+    btn.textContent = '⏸';
+    btn.title = 'Pause program';
+  }
+  const startBtn = document.getElementById('today-start-btn');
+  if(startBtn){
+    startBtn.disabled = S.paused;
+    startBtn.textContent = S.paused ? 'Paused — Resume to Train' : 'Start Workout';
+    startBtn.style.background = S.paused ? 'var(--surface3)' : '';
+    startBtn.style.color = S.paused ? 'var(--text-muted)' : '';
+  }
+  const todayHdr = document.querySelector('.today-card-hdr');
+  if(todayHdr){
+    todayHdr.style.background = S.paused ? 'rgba(255,229,102,0.04)' : '';
+    todayHdr.style.borderColor = S.paused ? 'rgba(255,229,102,0.15)' : '';
+  }
+}
+
+function confirmReset(){
+  document.getElementById('reset-modal').style.display = 'flex';
+}
+
+function closeModal(){
+  document.getElementById('reset-modal').style.display = 'none';
+}
+
+function doReset(){
+  localStorage.removeItem('pl4');
+  localStorage.removeItem('pl3');
+  location.reload();
+}
+
+// ═══════════════════════════════════════
+// HOME SCREEN
+// ═══════════════════════════════════════
+// Dynamic accessors replacing hardcoded constants
+function PHASE_ORDER(){ return getPhaseOrder(); }
+function PHASE_NAMES(){ return getPhaseNames(); }
+function PHASE_META(){ return getActiveProg().phaseMeta || {}; }
+function PDF_NOTES(){ return getActiveProg().pdfNotes || []; }
+
+function programStartDate(){
+  // Stored in state; fall back to today if not set
+  if(S.programStartDate) return new Date(S.programStartDate);
+  return null;
+}
+
+function totalSessionsAllPhases(){
+  return PHASE_ORDER().reduce((acc,p)=>acc+totalSess(p),0);
+}
+
+function doneSessionsAllPhases(){
+  return PHASE_ORDER().reduce((acc,p)=>acc+doneSess(p),0);
+}
+
+function addWeeksToDate(base, weeks){
+  const d = new Date(base);
+  d.setDate(d.getDate() + weeks*7);
+  return d;
+}
+
+function fmtDate(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+
+// Total days paused including any ongoing pause
+function totalPausedDays(){
+  let days = S.pausedDaysTotal || 0;
+  if(S.paused && S.pausedDate){
+    days += (Date.now() - new Date(S.pausedDate).getTime()) / 86400000;
+  }
+  return days;
+}
+
+// Estimate phase end / program end from start date + cadence + pause offset
+function phaseEndDate(phaseKey){
+  const start = programStartDate();
+  if(!start) return null;
+  let offset = 0;
+  for(const p of PHASE_ORDER()){
+    const sessions = totalSess(p);
+    const perWeek = (S.cadence||{})[p] || (PROG[p]||{}).defDays || 2;
+    const weeks = Math.ceil(sessions / perWeek);
+    offset += weeks;
+    if(p === phaseKey){
+      const base = addWeeksToDate(start, offset);
+      base.setDate(base.getDate() + Math.round(totalPausedDays()));
+      return base;
+    }
+  }
+  return null;
+}
+
+function programEndDate(){
+  const start = programStartDate();
+  if(!start) return null;
+  let offset = 0;
+  for(const p of PHASE_ORDER()){
+    const sessions = totalSess(p);
+    const perWeek = (S.cadence||{})[p] || (PROG[p]||{}).defDays || 2;
+    offset += Math.ceil(sessions / perWeek);
+  }
+  const base = addWeeksToDate(start, offset);
+  base.setDate(base.getDate() + Math.round(totalPausedDays()));
+  return base;
+}
+
+function calcStreak(){
+  if(!S.sessionLog || S.sessionLog.length === 0) return 0;
+  // Build sorted set of unique workout date strings
+  const dates = [...new Set(S.sessionLog.map(iso => iso.slice(0,10)))].sort();
+  if(dates.length === 0) return 0;
+  // Walk backwards from most recent, counting consecutive days that have workouts
+  // (streak = consecutive workout days, not calendar days — gaps are expected)
+  // We define streak as: sessions without a gap of more than 7 days between them
+  let streak = 1;
+  for(let i = dates.length - 1; i > 0; i--){
+    const curr = new Date(dates[i]);
+    const prev = new Date(dates[i-1]);
+    const gapDays = Math.round((curr - prev) / 86400000);
+    if(gapDays <= 7) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function lastWorkoutLabel(){
+  if(!S.sessionLog || S.sessionLog.length === 0) return '—';
+  const last = new Date(S.sessionLog[S.sessionLog.length - 1]);
+  const today = new Date(); today.setHours(0,0,0,0);
+  last.setHours(0,0,0,0);
+  const diff = Math.round((today - last) / 86400000);
+  if(diff === 0) return 'Today';
+  if(diff === 1) return 'Yesterday';
+  if(diff < 7) return `${diff}d ago`;
+  return fmtDate(last);
+}
+
+function updateHomeScreen(){
+  if(!S.activeProgram || !PS()) return;
+  const prog = getActiveProg();
+  const phase = S.currentPhase;
+  const pd = PROG[phase];
+  if(!pd) return;
+  const done = doneSessionsAllPhases();
+  const total = totalSessionsAllPhases();
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+
+  document.getElementById('home-phase-tag').textContent = pd.name;
+  document.getElementById('home-prog-name').textContent = prog.name;
+  document.getElementById('home-prog-sub').textContent = `${prog.publisher} · ${prog.weeks} weeks`;
+  document.getElementById('home-prog-fill').style.width = pct+'%';
+  document.getElementById('home-prog-pct').textContent = pct+'%';
+  document.getElementById('home-stat-phase').textContent = pd.name;
+  document.getElementById('home-stat-streak').textContent = calcStreak() + (calcStreak()===1?' day':' days');
+  document.getElementById('home-stat-last').textContent = lastWorkoutLabel();
+
+  // Breadcrumb label on workout screen
+  const sessDone = doneSess(phase);
+  const dayLabel = pd.type==='single' ? 'Foundational' : pd.type==='triple' ? `Workout ${(sessDone%3)+1}` : (sessDone%2===0?'Day 1':'Day 2');
+  const bcEl = document.getElementById('wo-bc-cur');
+  if(bcEl) bcEl.textContent = `${pd.name} · ${dayLabel}`;
+  const bcProgEl = document.getElementById('wo-bc-prog');
+  if(bcProgEl) bcProgEl.textContent = prog.name;
+
+  // Today's workout preview
+  const wo = currentWO();
+  const isIntensity = prog.trackingMode === 'intensity';
+  // For intensity programs show all exercises; for weight programs show main lifts first
+  const previewExes = isIntensity
+    ? wo.filter(ex => !ex.warmup && !ex.superset).slice(0, 4)
+    : wo.filter(ex => !ex.warmup && !ex.bw && ex.anchor).slice(0, 4);
+  document.getElementById('today-eyebrow').textContent = `${pd.name} · Session ${sessDone+1} of ${totalSess(phase)}`;
+  document.getElementById('today-title').textContent = currentDayLabel();
+
+  const exList = document.getElementById('today-ex-list');
+  exList.innerHTML = '';
+  previewExes.forEach(ex => {
+    const wt = suggestWt(ex);
+    const row = document.createElement('div');
+    row.className = 'today-ex-row';
+    const sets = ex.setsMin ? `${ex.setsMin}–${ex.sets}` : ex.sets;
+    const rightCol = wt!=null && ex.anchor && ex.pct
+      ? isIntensity
+        ? `<span class="today-ex-wt">${Math.round(ex.pct*100)}%</span><br><span class="today-ex-spec">${wt} lb · ${sets}×${repsLabel(ex)}</span>`
+        : `<span class="today-ex-wt">${wt} lb</span><br><span class="today-ex-spec">${sets} sets · ${repsLabel(ex)}</span>`
+      : `<span class="today-ex-spec">${sets} sets · ${repsLabel(ex)}</span>`;
+    row.innerHTML = `<span class="today-ex-name">${ex.name}</span><span style="text-align:right">${rightCol}</span>`;
+    exList.appendChild(row);
+  });
+  if(wo.length > previewExes.length){
+    const more = document.createElement('div');
+    more.className = 'today-ex-row';
+    more.innerHTML = `<span class="today-ex-name" style="color:var(--text-muted)">+${wo.length - previewExes.length} more exercises</span>`;
+    exList.appendChild(more);
+  }
+
+  // Greeting
+  const hr = new Date().getHours();
+  document.getElementById('home-greeting').textContent = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  updatePauseUI();
+}
+
+function updateOverviewScreen(){
+  calMonthOffset = null;
+  if(!S.activeProgram) return;
+  const prog = getActiveProg();
+  const phase = S.currentPhase;
+  const done = doneSessionsAllPhases();
+  document.getElementById('ov-sess-done').textContent = done;
+
+  // Dynamic program name & meta
+  document.getElementById('ov-prog-name').textContent = prog.name;
+  document.getElementById('ov-prog-meta').textContent = `${prog.publisher} · ${prog.weeks} weeks`;
+
+  const phaseEnd = phaseEndDate(phase);
+  const progEnd = programEndDate();
+  document.getElementById('ov-phase-end').textContent = phaseEnd ? fmtDate(phaseEnd) : '—';
+  document.getElementById('ov-prog-end').textContent = progEnd ? fmtDate(progEnd) : '—';
+
+  // Phase cards
+  const phaseMeta = PHASE_META();
+  const phasesEl = document.getElementById('ov-phases');
+  phasesEl.innerHTML = '';
+  PHASE_ORDER().forEach(pk => {
+    const pd = PROG[pk], meta = phaseMeta[pk] || {focus:'',notes:[]};
+    const pDone = doneSess(pk), pTotal = totalSess(pk);
+    const isCurrent = pk === phase;
+    const isComplete = pDone >= pTotal;
+    const status = isComplete ? 'done' : isCurrent ? 'current' : 'upcoming';
+    const badgeText = isComplete ? 'Complete' : isCurrent ? 'In Progress' : 'Upcoming';
+    const pEnd = phaseEndDate(pk);
+    const pPct = pTotal > 0 ? Math.round((pDone/pTotal)*100) : 0;
+    const notesHtml = (meta.notes||[]).map(n=>`<div class="phase-card-note">${n}</div>`).join('');
+    const progBar = isCurrent ? `<div class="phase-card-prog"><div class="phase-card-prog-fill" style="width:${pPct}%"></div></div>` : '';
+    const card = document.createElement('div');
+    card.className = `phase-card${isCurrent?' pc-current':''}${isComplete?' pc-done':''}`;
+    card.innerHTML = `
+      <div class="phase-card-hdr">
+        <div>
+          <div class="phase-card-name">${pd.name}</div>
+          <div class="phase-card-dates">${pDone}/${pTotal} sessions${pEnd?' · ends '+fmtDate(pEnd):''}</div>
+        </div>
+        <div class="pc-badge ${status}">${badgeText}</div>
+      </div>
+      ${progBar}
+      <div class="phase-card-focus">${meta.focus}</div>
+      <div class="phase-card-notes">${notesHtml}</div>`;
+    phasesEl.appendChild(card);
+  });
+
+  // Calendar
+  buildCalendar();
+
+  // PDF notes
+  const notesEl = document.getElementById('ov-pdf-notes');
+  notesEl.innerHTML = PDF_NOTES().map(n=>`<div class="pdf-note"><div class="pdf-note-text">${n}</div></div>`).join('');
+}
+
+// Calendar state — which month offset we're viewing (0 = program start month)
+let calMonthOffset = null; // set to current-month index on first build
+
+function buildCalendar(){
+  const calEl = document.getElementById('ov-calendar');
+  calEl.innerHTML = '';
+  const start = programStartDate();
+  if(!start){
+    calEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0">Calendar available after your first workout.</div>';
+    return;
+  }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Build program-length range
+  const progWeeks = getActiveProg().weeks || 12;
+  const programEnd = new Date(start);
+  programEnd.setDate(start.getDate() + (progWeeks * 7) - 1);
+
+  // Build set of logged date strings
+  const loggedDates = new Set();
+  (S.sessionLog||[]).forEach(iso => {
+    const d = new Date(iso);
+    loggedDates.add(d.toISOString().slice(0,10));
+  });
+
+  // All months spanned by the program
+  const months = []; // [{year, month(0-11)}]
+  let cur = new Date(start.getFullYear(), start.getMonth(), 1);
+  const endMonth = new Date(programEnd.getFullYear(), programEnd.getMonth(), 1);
+  while(cur <= endMonth){
+    months.push({year: cur.getFullYear(), month: cur.getMonth()});
+    cur.setMonth(cur.getMonth() + 1);
+  }
+
+  // Default to month containing today (or last month if today is past program end)
+  if(calMonthOffset === null){
+    calMonthOffset = months.findIndex(m => m.year === today.getFullYear() && m.month === today.getMonth());
+    if(calMonthOffset < 0) calMonthOffset = months.length - 1;
+  }
+  calMonthOffset = Math.max(0, Math.min(calMonthOffset, months.length - 1));
+
+  const {year, month} = months[calMonthOffset];
+  const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // Nav header
+  const nav = document.createElement('div');
+  nav.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px';
+  const prevDis = calMonthOffset === 0;
+  const nextDis = calMonthOffset === months.length - 1;
+  nav.innerHTML = `
+    <button onclick="calNav(-1)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:${prevDis?'var(--text-muted)':'var(--accent)'};font-size:16px;cursor:${prevDis?'default':'pointer'};opacity:${prevDis?'0.3':'1'}" ${prevDis?'disabled':''}>‹</button>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.06em;color:var(--text)">${MONTH_NAMES[month]} ${year}</div>
+    <button onclick="calNav(1)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:${nextDis?'var(--text-muted)':'var(--accent)'};font-size:16px;cursor:${nextDis?'default':'pointer'};opacity:${nextDis?'0.3':'1'}" ${nextDis?'disabled':''}>›</button>`;
+  calEl.appendChild(nav);
+
+  // DOW header
+  const dowRow = document.createElement('div');
+  dowRow.className = 'cal-dow-row';
+  DAYS.forEach(d => { const c = document.createElement('div'); c.className='cal-dow'; c.textContent=d; dowRow.appendChild(c); });
+  calEl.appendChild(dowRow);
+
+  // Grid
+  const grid = document.createElement('div');
+  grid.className = 'cal-grid';
+  const firstDow = new Date(year, month, 1).getDay();
+  for(let i = 0; i < firstDow; i++){ const e = document.createElement('div'); e.className='cal-cell empty'; grid.appendChild(e); }
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  for(let d = 1; d <= daysInMonth; d++){
+    const date = new Date(year, month, d);
+    date.setHours(0,0,0,0);
+    const dateKey = date.toISOString().slice(0,10);
+
+    // Only colour days within the 84-day program window
+    const inProgram = date >= start && date <= programEnd;
+    const isLogged = loggedDates.has(dateKey);
+    const isPast = date < today;
+    const isToday = date.getTime() === today.getTime();
+
+    const cell = document.createElement('div');
+    let cls = 'cal-cell ';
+    if(!inProgram) cls += 'empty';
+    else if(isToday) cls += 'today-cell';
+    else if(isLogged) cls += 'logged';
+    else if(isPast) cls += 'rest';
+    else cls += 'future-rest';
+    cell.className = cls;
+    cell.textContent = d;
+    // Style out-of-program days more subtly
+    if(!inProgram) cell.style.color = 'var(--text-muted)';
+    grid.appendChild(cell);
+  }
+  calEl.appendChild(grid);
+
+  // Month progress note
+  const totalLogged = loggedDates.size;
+  const note = document.createElement('div');
+  note.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-muted);text-align:center';
+  note.textContent = `${totalLogged} workout${totalLogged===1?'':'s'} logged · ${months.length} months in program`;
+  calEl.appendChild(note);
+
+  // Legend
+  const legend = document.createElement('div');
+  legend.className = 'cal-legend';
+  legend.style.marginTop = '10px';
+  legend.innerHTML = `
+    <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--accent)"></div>Today</div>
+    <div class="cal-leg-item"><div class="cal-leg-dot" style="background:rgba(0,229,255,0.12);border:1px solid rgba(0,229,255,0.2)"></div>Logged</div>
+    <div class="cal-leg-item"><div class="cal-leg-dot" style="background:var(--surface2)"></div>Rest</div>`;
+  calEl.appendChild(legend);
+}
+
+function calNav(dir){
+  calMonthOffset = (calMonthOffset || 0) + dir;
+  buildCalendar();
+}
+
+function goToWorkout(){
+  initWO();
+  goScreen('screen-workout');
+}
+
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
+// SETTINGS SCREEN
+// ═══════════════════════════════════════
+function updateSettingsScreen(){
+  if(!S.activeProgram || !PS()) return;
+  const prog = getActiveProg();
+  const ps = PS();
+
+  // Program info card
+  const infoCard = document.getElementById('set-prog-info');
+  const phase = S.currentPhase;
+  const pd = PROG[phase] || {};
+  infoCard.innerHTML = `
+    <div class="settings-info-row">
+      <span class="settings-info-label">Program</span>
+      <span class="settings-info-val">${prog.name}</span>
+    </div>
+    <div class="settings-info-row">
+      <span class="settings-info-label">Current phase</span>
+      <span class="settings-info-val">${pd.name||'—'}</span>
+    </div>
+    <div class="settings-info-row">
+      <span class="settings-info-label">Sessions logged</span>
+      <span class="settings-info-val">${doneSessionsAllPhases()} / ${totalSessionsAllPhases()}</span>
+    </div>
+    <div class="settings-info-row">
+      <span class="settings-info-label">Tracking mode</span>
+      <span class="settings-info-val" style="text-transform:capitalize">${prog.trackingMode}</span>
+    </div>`;
+
+  // Populate max fields
+  const mx = ps.maxes || {};
+  const fields = ['squat','dead','bench','ohp'];
+  fields.forEach(k => {
+    const el = document.getElementById('set-mx-'+k);
+    if(el) el.value = mx[k] || '';
+  });
+
+  // Reset save button
+  const btn = document.getElementById('settings-save-btn');
+  if(btn){ btn.textContent = 'Save Maxes'; btn.classList.remove('saved'); }
+}
+
+async function saveMaxes(){
+  if(!PS()) return;
+  const fields = [
+    {id:'set-mx-squat', key:'squat'},
+    {id:'set-mx-dead',  key:'dead'},
+    {id:'set-mx-bench', key:'bench'},
+    {id:'set-mx-ohp',   key:'ohp'},
+  ];
+  let changed = false;
+  fields.forEach(f => {
+    const v = parseFloat(document.getElementById(f.id).value);
+    if(v > 0){ PS().maxes[f.key] = v; changed = true; }
+  });
+  if(!changed) return;
+  await persist();
+  // Visual feedback
+  const btn = document.getElementById('settings-save-btn');
+  btn.textContent = '✓ Saved';
+  btn.classList.add('saved');
+  setTimeout(() => {
+    btn.textContent = 'Save Maxes';
+    btn.classList.remove('saved');
+  }, 2000);
+}
+
+// Hook settings screen into goScreen
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='screen-home') updateHomeScreen();
+  if(id==='screen-overview') updateOverviewScreen();
+  if(id==='screen-settings') updateSettingsScreen();
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+(async () => {
+  await restore();
+  if(S.activeProgram && PS() && (PS().maxes||{}).squat > 0){
+    if(!PS().programStartDate){ PS().programStartDate = new Date().toISOString(); await persist(); }
+    initWO();
+    goScreen('screen-home');
+  }
+})();
+</script>
+
+<!-- ═══════════════════════════
+     SETTINGS
+═══════════════════════════ -->
+
+<div id="screen-settings" class="screen">
+  <div class="settings-topbar">
+    <button class="settings-back" onclick="goScreen('screen-home')">‹ Home</button>
+    <div class="settings-topbar-title">Settings</div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-sec-label">Active Program</div>
+    <div class="settings-card" id="set-prog-info">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-sec-label">Working Maxes</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5">Your estimated 1-rep max for each anchor lift. Used to calculate starting weights and progression targets across all exercises.</div>
+    <div class="settings-card">
+      <div class="settings-row">
+        <div><div class="settings-row-label">Barbell Squat</div><div class="settings-row-sub">Anchor for lower body exercises</div></div>
+        <div class="max-input-wrap">
+          <input class="max-input" type="number" id="set-mx-squat" inputmode="numeric" placeholder="225">
+          <span class="max-input-unit">LB</span>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Deadlift</div><div class="settings-row-sub">Anchor for back & hinge movements</div></div>
+        <div class="max-input-wrap">
+          <input class="max-input" type="number" id="set-mx-dead" inputmode="numeric" placeholder="275">
+          <span class="max-input-unit">LB</span>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Bench Press</div><div class="settings-row-sub">Anchor for chest, arms, accessories</div></div>
+        <div class="max-input-wrap">
+          <input class="max-input" type="number" id="set-mx-bench" inputmode="numeric" placeholder="185">
+          <span class="max-input-unit">LB</span>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Overhead Press</div><div class="settings-row-sub">Anchor for shoulder movements</div></div>
+        <div class="max-input-wrap">
+          <input class="max-input" type="number" id="set-mx-ohp" inputmode="numeric" placeholder="135">
+          <span class="max-input-unit">LB</span>
+        </div>
+      </div>
+    </div>
+    <button class="settings-save-btn" id="settings-save-btn" onclick="saveMaxes()">Save Maxes</button>
+  </div>
+
+  <div class="settings-section" style="padding-bottom:48px">
+    <div class="settings-sec-label">About</div>
+    <div class="settings-card">
+      <div class="settings-info-row">
+        <span class="settings-info-label">App</span>
+        <span class="settings-info-val">Forge</span>
+      </div>
+      <div class="settings-info-row">
+        <span class="settings-info-label">Version</span>
+        <span class="settings-info-val">0.3 — Multi-Program</span>
+      </div>
+      <div class="settings-info-row">
+        <span class="settings-info-label">Programs available</span>
+        <span class="settings-info-val" id="set-prog-count">3</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
