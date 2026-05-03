@@ -117,6 +117,21 @@ background: linear-gradient(to top, var(–bg) 70%, transparent); z-index: 20;
 .ob-dot { width: 6px; height: 6px; border-radius: 50%; background: var(–border2); transition: all 0.3s; }
 .ob-dot.active { background: var(–accent); width: 20px; border-radius: 3px; }
 
+
+.mob-tab {
+  flex-shrink:0; padding:8px 16px;
+  background:var(--surface2); border:1px solid var(--border2); border-radius:20px;
+  font-family:'Rajdhani',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.06em;
+  color:var(--text-muted); cursor:pointer; transition:all 0.15s;
+}
+.mob-tab-active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+.mob-ex-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0; border-bottom:1px solid var(--border);
+}
+.mob-ex-row:last-child { border-bottom:none; }
+.mob-ex-name { font-size:14px; color:var(--text); font-family:'Rajdhani',sans-serif; font-weight:600; }
+.mob-ex-reps { font-size:13px; color:var(--accent); font-family:'Rajdhani',sans-serif; font-weight:700; flex-shrink:0; margin-left:12px; text-align:right; }
 .btn-primary {
 width: 100%; padding: 18px; background: var(–accent); border: none; border-radius: var(–r);
 font-family: ‘Rajdhani’, sans-serif; font-size: 17px; font-weight: 700;
@@ -766,6 +781,9 @@ letter-spacing: 0.06em; color: var(–accent); cursor: pointer; text-transform: 
 
   <div class="home-section">
     <div class="home-sec-label">Today's Workout</div>
+    <button onclick="goScreen('screen-mobility')" style="display:block;width:100%;margin-bottom:10px;padding:13px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);cursor:pointer;text-align:left">
+      🧘 Mobility Sessions &nbsp;<span style="font-size:12px;font-weight:500;color:var(--text-muted)">Daily on non-training days · 20–45 min</span>
+    </button>
     <div class="today-card">
       <div class="today-card-hdr">
         <div class="today-card-eyebrow" id="today-eyebrow">Loading…</div>
@@ -2764,6 +2782,7 @@ function goToWorkout(){
 // SETTINGS SCREEN
 // ═══════════════════════════════════════
 function updateSettingsScreen(){
+  try {
   if(!S.activeProgram || !PS()) return;
   const prog = getActiveProg();
   const ps = PS();
@@ -2801,6 +2820,7 @@ function updateSettingsScreen(){
   // Reset save button
   const btn = document.getElementById('settings-save-btn');
   if(btn){ btn.textContent = 'Save Maxes'; btn.classList.remove('saved'); }
+  } catch(e){ console.error('updateSettingsScreen error:', e); }
 }
 
 async function saveMaxes(){
@@ -2842,6 +2862,110 @@ function goScreen(id){
   if(id==='screen-home') updateHomeScreen();
   if(id==='screen-overview') updateOverviewScreen();
   if(id==='screen-settings') updateSettingsScreen();
+  if(id==='screen-mobility') buildMobilityScreen();
+}
+
+
+// ═══════════════════════════════════════
+// MOBILITY SESSIONS
+// ═══════════════════════════════════════
+const MOB_SESSIONS = {
+  1: {
+    name: "Session 1 — Carries & Bands",
+    exercises: [
+      {name:"Walking Inchworm to Upward Facing Dog", reps:"20 yards"},
+      {name:"90/90 Stretch", reps:"10/10"},
+      {name:"Walking In-Step Lunge with Shoulder Rotations", reps:"20 yards"},
+      {name:"Rubber Band Knee Abduction", reps:"30/30"},
+      {name:"Rubber Band Knee Adduction", reps:"30/30"},
+      {name:"Rubber Band Pull-A-Parts", reps:"20"},
+      {name:"Rubber Band Internal Rotation", reps:"20/20"},
+      {name:"Front Loaded Kettlebell Walk", reps:"40 yards (down & back)"},
+      {name:"Suitcase Carry", reps:"40 yards"},
+      {name:"Kettlebell 1 Arm Overhead Carry", reps:"40 yards"},
+      {name:"Foam Roll: Piriformis", reps:"20 sec"},
+      {name:"Foam Roll: IT Band", reps:"20 sec"},
+      {name:"Foam Roll: Erector Spinae", reps:"20 sec"},
+    ]
+  },
+  2: {
+    name: "Session 2 — Stick Mobility",
+    exercises: [
+      {name:"Stick Mobility: X Swing", reps:"10/10"},
+      {name:"Stick Mobility: Retractor", reps:"6/6"},
+      {name:"Stick Mobility: The Twister", reps:"10"},
+      {name:"Stick Mobility: Stick Pigeon", reps:"4/4"},
+      {name:"Stick Mobility: Monkey Hang", reps:"4/4"},
+      {name:"Push-Up to Shoulder Rotation", reps:"10"},
+      {name:"Pull-Ups (assisted if needed)", reps:"10"},
+      {name:"Tricep Dips", reps:"15"},
+      {name:"Bear Crawl", reps:"40 yards (down & back)"},
+      {name:"Foam Roll: Quads/Hip Flexors", reps:"20 sec"},
+      {name:"Foam Roll: Hamstrings", reps:"20 sec"},
+      {name:"Foam Roll: Piriformis", reps:"20 sec"},
+    ]
+  },
+  3: {
+    name: "Session 3 — Stick & Movement",
+    exercises: [
+      {name:"Stick Mobility: Slap Shot", reps:"10/10"},
+      {name:"Stick Mobility: Hammer Twist", reps:"10/10"},
+      {name:"Stick Mobility: Hippy Dip", reps:"10/10"},
+      {name:"Walking Heel Squat", reps:"40/40 yards"},
+      {name:"Inchworms", reps:"20 yards"},
+      {name:"Stick Dislocates", reps:"10"},
+      {name:"Stick Mobility: Human Bow and Arrow", reps:"10/10"},
+      {name:"Good Morning Knees Bent", reps:"10"},
+      {name:"Dunphy Squat", reps:"6–8"},
+      {name:"Stick Lateral Drivers", reps:"10/10"},
+      {name:"Stick ISO Drivers", reps:"10"},
+      {name:"MAPS Low/High Press", reps:"10/10"},
+      {name:"MAPS Rotational Lunge", reps:"10/10"},
+      {name:"Landmine Cossack Squat", reps:"10/10"},
+    ]
+  },
+  4: {
+    name: "Session 4 — Full Body Flow",
+    exercises: [
+      {name:"90/90 Stretch", reps:"6/6"},
+      {name:"Supine Scorpions", reps:"10"},
+      {name:"Downward Dog 1 Foot Isolating", reps:"6"},
+      {name:"In Step Lunge With Rotation", reps:"10"},
+      {name:"Rubber Band Vertical Pull-A-Parts", reps:"10/10"},
+      {name:"Rubber Band External Rotation", reps:"20"},
+      {name:"Hands Free Push-Ups", reps:"10–15"},
+      {name:"MAPS Side Chop", reps:"15/15"},
+      {name:"Downward Chop", reps:"15/15"},
+      {name:"Walking Lunges", reps:"40/40 yards"},
+      {name:"Renegade Rows", reps:"10–15"},
+      {name:"Dumbbell Rotating Shoulder Press", reps:"10–15"},
+      {name:"Farmer Carry", reps:"40 yards"},
+    ]
+  }
+};
+
+let activeMobSession = 1;
+
+function showMobSession(n){
+  activeMobSession = n;
+  // Update tabs
+  document.querySelectorAll('.mob-tab').forEach((t,i) => {
+    t.classList.toggle('mob-tab-active', i+1 === n);
+  });
+  buildMobilityScreen();
+}
+
+function buildMobilityScreen(){
+  const s = MOB_SESSIONS[activeMobSession];
+  if(!s) return;
+  const el = document.getElementById('mob-session-content');
+  if(!el) return;
+  let html = '<div style="font-family:Rajdhani,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:12px">' + s.name + '</div>';
+  html += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:16px">Pick exercises that target your weak areas. 1–3 sets per exercise.</div>';
+  s.exercises.forEach(ex => {
+    html += '<div class="mob-ex-row"><span class="mob-ex-name">' + ex.name + '</span><span class="mob-ex-reps">' + ex.reps + '</span></div>';
+  });
+  el.innerHTML = html;
 }
 
 // ═══════════════════════════════════════
@@ -2929,6 +3053,26 @@ function goScreen(id){
   </div>
 </div>
 
+
+<!-- ═══════════════════════════
+     MOBILITY SESSIONS
+═══════════════════════════ -->
+<div id="screen-mobility" class="screen">
+  <div class="settings-topbar">
+    <button class="settings-back" onclick="goScreen('screen-home')">‹ Home</button>
+    <div class="settings-topbar-title">Mobility Sessions</div>
+  </div>
+  <div style="padding:0 16px 16px;font-size:12px;color:var(--text-muted);line-height:1.6;border-bottom:1px solid var(--border)">
+    Complete daily on all non-foundational workout days · 20–45 min · Active recovery, not a fatiguing workout
+  </div>
+  <div id="mob-session-tabs" style="display:flex;gap:8px;padding:12px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--border)">
+    <button class="mob-tab mob-tab-active" onclick="showMobSession(1)">Session 1</button>
+    <button class="mob-tab" onclick="showMobSession(2)">Session 2</button>
+    <button class="mob-tab" onclick="showMobSession(3)">Session 3</button>
+    <button class="mob-tab" onclick="showMobSession(4)">Session 4</button>
+  </div>
+  <div id="mob-session-content" style="padding:12px 16px 80px;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+</div>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
