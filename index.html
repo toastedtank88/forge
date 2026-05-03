@@ -1959,7 +1959,7 @@ function renderWO(){
                <div style="font-size:9px;text-align:center;color:var(--text-muted);letter-spacing:0.05em;margin-top:2px">${Math.round(ex.pct*100)}% 1RM</div>
              </div>`
           // Standard weight (including addedWeight which allows negatives)
-          : `<input class="wt-field" type="number" ${needsNeg?'':'inputmode="decimal"'} value="${wv}" placeholder="${wt!=null?wt:0}" onclick="event.stopPropagation()" oninput="onWt('${ex.id}',${s},this.value)"${needsNeg?' min="-999"':''}>
+          : `<input class="wt-field" ${needsNeg?'type="text" inputmode="decimal" pattern="-?[0-9]*"':'type="number" inputmode="decimal"'} value="${wv}" placeholder="${needsNeg?'0 (BW)':wt!=null?wt:0}" onclick="event.stopPropagation()" oninput="onWt('${ex.id}',${s},this.value)">
              <div class="reps-stepper">
                <button class="rep-btn" onclick="event.stopPropagation();adjR('${ex.id}',${s},-1)">−</button>
                <div class="rep-val" id="rv-${ex.id}-${s}">${rv}</div>
