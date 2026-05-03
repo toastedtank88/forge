@@ -2795,7 +2795,7 @@ function updateSettingsScreen(){
   const fields = ['squat','dead','bench','ohp'];
   fields.forEach(k => {
     const el = document.getElementById('set-mx-'+k);
-    if(el) el.value = mx[k] || '';
+    if(el) el.value = (mx[k] && mx[k] > 0) ? mx[k] : '';
   });
 
   // Reset save button
@@ -2818,6 +2818,12 @@ async function saveMaxes(){
   });
   if(!changed) return;
   await persist();
+  // Refresh fields with confirmed saved values so they don't blank out
+  const savedMx = PS().maxes || {};
+  [{id:'set-mx-squat',key:'squat'},{id:'set-mx-dead',key:'dead'},{id:'set-mx-bench',key:'bench'},{id:'set-mx-ohp',key:'ohp'}].forEach(f => {
+    const el = document.getElementById(f.id);
+    if(el && savedMx[f.key] > 0) el.value = savedMx[f.key];
+  });
   // Visual feedback
   const btn = document.getElementById('settings-save-btn');
   btn.textContent = '✓ Saved';
